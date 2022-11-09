@@ -2,88 +2,100 @@ import { supabase } from "./supabase";
 
 const redirectUrl = "/"; // TODO - add query for messages
 
-type signInWithEmailArgs = {
+export type signInWithEmailArgs = {
     email: string;
     password: string;
 };
 
 async function signInWithEmail({ email = "", password = "" }: signInWithEmailArgs) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-    return { data, error };
+        return { data, error };
+    } catch (error) {
+        return { data: null, error };
+    }
 }
 
-type providers = "google" | "facebook" | "discord";
+export type providers = "google" | "facebook" | "discord";
 
 async function signInWithProvider(provider: providers) {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-            // TODO add query for messages
-            redirectTo: redirectUrl,
-        },
-    });
-    return { data, error };
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                // TODO add query for messages
+                redirectTo: redirectUrl,
+            },
+        });
+        return { data, error };
+    } catch (error) {
+        return { data: null, error };
+    }
 }
 
 async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    try {
+        const { error } = await supabase.auth.signOut();
+        return { error };
+    } catch (error) {
+        return { error };
+    }
 }
 
-interface updateData {
+export interface updateProfileArgs {
     name?: string;
     email?: string;
     avatar_url?: string;
 }
 
-async function useUpdateProfile(dataForUpdate: updateData = {}) {
-    const { data } = await supabase.auth.getSession();
-    const session = data.session;
-
-    if (session === null) {
-        return { error: "No session" };
-    }
-
-    const user_id: string | undefined = data?.session?.user?.id;
-
-    dataForUpdate = {
-        email: data?.session?.user?.new_email || data?.session?.user?.email,
-        avatar_url: data?.session?.user?.user_metadata?.avatar_url,
-        name: data?.session?.user?.user_metadata?.name,
-        ...dataForUpdate,
-    };
-
+async function useUpdateProfile(user_id: string, dataForUpdate: updateProfileArgs = {}) {
     const { name, email, avatar_url } = dataForUpdate;
-
-    const { data: updateUserData, error: updateUserError } = await supabase.auth.updateUser({
-        data: {
-            name,
-            avatar_url,
-        },
-        email,
-    });
-
-    const { error } = await supabase
-        .from("profiles")
-        .update({
-            name,
-            avatar_url,
+    try {
+        const { data, error: updateUserError } = await supabase.auth.updateUser({
+            data: {
+                name,
+                avatar_url,
+            },
             email,
-        })
-        .eq("id", user_id);
-    return { error, updateUserData, updateUserError };
+        });
+
+        const { error: updateProfilesError } = await supabase
+            .from("profiles")
+            .update({
+                name,
+                avatar_url,
+                email,
+            })
+            .eq("id", user_id);
+
+        const error =
+            updateProfilesError && updateUserError
+                ? {
+                      updateUserError,
+                      updateProfilesError,
+                  }
+                : updateProfilesError || updateUserError;
+
+        return { error, data };
+    } catch (error) {
+        return { error, data: null };
+    }
 }
 
 async function resetEmailPassword(email: string) {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        // TODO add query for messages
-        redirectTo: redirectUrl,
-    });
-    return { data, error };
+    try {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            // TODO add query for messages
+            redirectTo: redirectUrl,
+        });
+        return { data, error };
+    } catch (error) {
+        return { data: null, error };
+    }
 }
 
 export { signInWithProvider, signOut, useUpdateProfile, signInWithEmail, resetEmailPassword };

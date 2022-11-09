@@ -1,47 +1,12 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import { onMounted, ref } from "vue";
+import { useAuthStore } from "@/store/useAuth";
 import HelloWorld from "./components/HelloWorld.vue";
-import { Session } from "@supabase/supabase-js";
-import { signInWithProvider, signOut, useUpdateProfile } from "./api/auth";
-import { supabase } from "./api/supabase";
 
-async function signIn() {
-    const { data, error } = await signInWithProvider("google");
-    console.log(data, error);
-}
-async function signInFacebook() {
-    const { data, error } = await signInWithProvider("facebook");
-    console.log(data, error);
-}
-
-async function signInDiscord() {
-    const { data, error } = await signInWithProvider("discord");
-    console.log(data, error);
-}
-
-async function handleSignOut() {
-    const { error } = await signOut();
-    console.log(error);
-}
-
-const session = ref<null | Session>(null);
+const auth = useAuthStore();
 
 function updateData() {
-    useUpdateProfile({ email: "kevin-test2@sample.com", name: "hello!------" });
+    auth.handleUpdateUser({ email: "kevin-test2@sample.com", name: "hello!------" });
 }
-
-onMounted(async () => {
-    supabase.auth.getSession().then(({ data }) => {
-        console.log(data);
-    });
-
-    supabase.auth.onAuthStateChange((_, _session) => {
-        console.log("session", _session);
-        session.value = _session;
-    });
-});
 </script>
 
 <template>
@@ -53,10 +18,10 @@ onMounted(async () => {
             <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
         </a>
     </div>
-    <button @click="signIn">google</button>
-    <button @click="signInFacebook">facebook</button>
-    <button @click="signInDiscord">Discord</button>
-    <button @click="handleSignOut">signOut</button>
+    <button @click="auth.signInWithProvider('google')">google</button>
+    <button @click="auth.signInWithProvider('facebook')">facebook</button>
+    <button @click="auth.signInWithProvider('discord')">Discord</button>
+    <button @click="auth.handleSignOut">signOut</button>
     <button @click="updateData">update</button>
     <HelloWorld msg="Vite + Vue" />
 </template>
