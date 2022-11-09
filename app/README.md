@@ -4,7 +4,7 @@ This template should help get you started developing with Vue 3 and TypeScript i
 
 ## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+-   [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
 ## Type Support For `.vue` Imports in TS
 
@@ -14,3 +14,14 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+
+## Auth
+
+### Provider
+
+-   google
+    -   kevin.hws.hsu@gmail.com
+-   facebook
+    -   kevin.hws.hsu@gmail.com
+-   discord
+    -   kevinshu1995@gmail.com
