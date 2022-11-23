@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useAuthStore } from "@/store/useAuth";
+import { getGames, getGame } from "@/api/game";
 import HelloWorld from "./components/HelloWorld.vue";
 
 const auth = useAuthStore();
@@ -7,6 +9,20 @@ const auth = useAuthStore();
 function updateData() {
     auth.handleUpdateUser({ email: "kevin-test2@sample.com", name: "hello!------" });
 }
+
+onMounted(async () => {
+    const { data, error } = await getGames();
+    if (data !== null) {
+        console.log("games", data);
+    }
+});
+
+onMounted(async () => {
+    const { data, error } = await getGame({ id: "1" });
+    if (data !== null) {
+        console.log("game id 1", data);
+    }
+});
 </script>
 
 <template>
