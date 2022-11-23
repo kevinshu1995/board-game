@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { HttpError } from "./utils.ts";
 
 export const supabaseAdmin = createClient(
