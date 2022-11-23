@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useAuthStore } from "@/store/useAuth";
-import { getGames, getGame } from "@/api/game";
+import { useAuth } from "@/store";
+import { getGames, getGame } from "@/api";
 import HelloWorld from "./components/HelloWorld.vue";
 
-const auth = useAuthStore();
+const auth = useAuth();
 
 function updateData() {
     auth.handleUpdateUser({ email: "kevin-test2@sample.com", name: "hello!------" });

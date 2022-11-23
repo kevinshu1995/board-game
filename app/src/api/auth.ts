@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from "./lib/supabase";
 
 const redirectUrl = "/"; // TODO - add query for messages
 

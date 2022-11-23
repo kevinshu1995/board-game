@@ -8,11 +8,11 @@ import {
     useUpdateProfile,
     signInWithEmail as handleSignInWithEmail,
     resetEmailPassword as handleResetEmailPassword,
-} from "@/api/auth";
-import type { providers, signInWithEmailArgs, updateProfileArgs } from "@/api/auth";
-import { supabase } from "@/api/supabase";
+} from "@/api";
+import type { providers, signInWithEmailArgs, updateProfileArgs } from "@/api";
+import { supabase } from "@/api/lib/supabase";
 
-export const useAuthStore = defineStore("useAuthStore", () => {
+export const useAuth = defineStore("useAuth", () => {
     const sessionState = ref<Session | null>(null);
 
     const session = computed(() => {

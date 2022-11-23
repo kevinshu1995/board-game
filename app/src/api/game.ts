@@ -1,4 +1,4 @@
-import { axiosSupabaseAnon } from "./axios";
+import { axiosSupabaseAnon } from "./lib/axios";
 
 const functionsUrl = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
 
