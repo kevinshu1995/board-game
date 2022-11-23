@@ -12,5 +12,6 @@ scoop install supabase
 ```bash
 # generate type
 
-supabase gen types typescript --local > ./../app/src/api/database.types.ts
+supabase gen types typescript --linked > ./../app/src/api/database.types.ts
 ```
+
