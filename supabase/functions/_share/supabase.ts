@@ -6,7 +6,7 @@ export const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
 );
 
-export const isValidUser = async (req: Request) => {
+export const validUser = async (req: Request) => {
     const authHeader = req.headers.get("Authorization")!;
     // Get JWT from auth header
     const jwt = authHeader.replace("Bearer ", "");
@@ -20,6 +20,6 @@ export const isValidUser = async (req: Request) => {
     } = await supabaseAdmin.auth.getUser(jwt);
     if (!user) throw new HttpError("Token is inValid", 403);
 
-    return true;
+    return user;
 };
 
