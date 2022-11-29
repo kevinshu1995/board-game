@@ -1,3 +1,5 @@
+import { validate, firstMessages } from "https://deno.land/x/validasaur/mod.ts";
+
 export const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey",
@@ -28,4 +30,22 @@ export const generateResponse = (data: any, status: number, message: string) =>
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status,
     });
+
+type ValidateBody = (
+    body: object,
+    rules: object
+) => Promise<[passes: boolean, errors: object, errorCb: () => void]>;
+
+export const validateBody: ValidateBody = async (body, rules) => {
+    const [passes, errors] = await validate(body, { ...rules });
+
+    function errorCb() {
+        if (passes === false) {
+            const errorMsg = Object.values(firstMessages(errors)).join(", ");
+            return generateResponse(null, 400, `Bad Request - ${errorMsg}`);
+        }
+    }
+
+    return [passes, errors, errorCb];
+};
 
