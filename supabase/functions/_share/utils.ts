@@ -21,6 +21,20 @@ export function handleUrlPattern(targetUrl: string, url: string = "") {
     return taskPattern.exec(targetUrl);
 }
 
+export function parseUrlQuery(url: string): object | null {
+    const { search } = new URLPattern(url);
+    if (search === "") {
+        return null;
+    }
+    return search.split("&").reduce((query: object, curr: string) => {
+        const [key, value] = curr.split("=");
+        return {
+            ...query,
+            [key]: value,
+        };
+    }, {});
+}
+
 export const generateResponseObj = (data: any, status: number, message: string) => {
     return data === null ? { status, message } : { data, status, message };
 };

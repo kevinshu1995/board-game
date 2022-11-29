@@ -7,16 +7,20 @@ import {
     corsHeaders,
     HttpError,
     handleUrlPattern,
+    parseUrlQuery,
     generateResponse,
     validateBody,
 } from "../_share/utils.ts";
 
 import {
     required,
-    isNumber,
     nullable,
     isString,
     isBool,
+    isIn,
+    minLength,
+    minNumber,
+    isInt,
 } from "https://deno.land/x/validasaur/mod.ts";
 
 enum RoomStatus {
@@ -63,14 +67,14 @@ async function createNewRoom(supabaseClient: any, body: CreateRoom | null, user:
     }
     const [passes, errors, errorCb] = await validateBody(body, {
         // required
-        game_id: [required, isNumber],
-        team_count: [required, isNumber],
-        player_count_max: [required, isNumber],
+        game_id: [required, isInt],
+        team_count: [required, isInt],
+        player_count_max: [required, isInt],
         // options
-        round_seconds: [nullable, isNumber],
+        round_seconds: [nullable, isInt],
         room_name: [isString],
         does_guest_can_chat: [isBool],
-        password: [nullable, isString],
+        password: [nullable, isString, minLength(4)],
         is_private: [isBool],
         is_optional_game_role: [isBool],
     });
@@ -112,7 +116,7 @@ async function registerUserToRoom(
     const [passes, errors, errorCb] = await validateBody(
         { room_id },
         {
-            room_id: [required, isNumber],
+            room_id: [required, isInt],
         }
     );
 
@@ -187,11 +191,103 @@ async function registerUserToRoom(
 
     if (currentPlayerError) throw currentPlayerError;
 
+    // TODO 改用 database trigger 更新 is_full
+    const { error: updateGameRoomsError } = await supabaseClient
+        .from("game_rooms")
+        .update({ is_full: maxPlayers <= playerCounts + 1 }) // +1 是因為 playerCounts 不包含這個新註冊的使用者
+        .eq("id", room_id);
+
     return generateResponse(
         {
             currentPlayer: currentPlayerData[0],
             players: playersData,
             room: gameRoomsData[0],
+        },
+        200,
+        "success"
+    );
+}
+
+type RoomListBody = {
+    status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete; // 要哪種狀態的房間, 沒給就是不篩選
+    is_full?: boolean; // 要哪種狀態的房間，沒給就是不篩選
+    has_password?: boolean; // 要哪種狀態的房間，沒給就是不篩選
+    per_page?: number;
+    page?: number;
+    keyword?: string; // 搜尋房間標題用
+};
+
+// 取得公開的房間列表
+// [get] api/v1/rooms - 取得全部房間 (僅能取得公開房間)
+async function getRoomList(supabaseClient: any, body: RoomListBody) {
+    if (body === null) {
+        return generateResponse(null, 400, "Bad Request - body is required");
+    }
+    const [passes, errors, errorCb] = await validateBody(body, {
+        // options
+        status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete]),
+        is_full: [isBool],
+        has_password: [isBool],
+        per_page: [isInt, minNumber(1)],
+        page: [isInt, minNumber(1)],
+        keyword: [isString],
+    });
+    errorCb();
+
+    let query = supabaseClient.from("game_rooms").select();
+    let count = supabaseClient.from("game_rooms").select("*", {
+        count: "exact",
+        head: true,
+    });
+
+    query = query.eq("is_private", false);
+    count = count.eq("is_private", false);
+
+    if (body.status !== undefined) {
+        query = query.eq("status", body.status);
+        count = count.eq("status", body.status);
+    }
+    if (body.is_full !== undefined) {
+        query = query.eq("is_full", body.is_full);
+        count = count.eq("is_full", body.is_full);
+    }
+    if (body.has_password !== undefined) {
+        if (body.has_password) {
+            query = query.not("password", "is", null);
+            count = count.not("password", "is", null);
+        } else {
+            query = query.is("password", null);
+            count = count.is("password", null);
+        }
+    }
+    if (body.keyword !== undefined) {
+        query = query.textSearch("room_name", body.keyword);
+        count = count.textSearch("room_name", body.keyword);
+    }
+
+    // page
+    const page: number = Number(body.page) || 1;
+    const per_page: number = Number(body.per_page) || 10;
+    const from: number = (page - 1) * per_page;
+    const to: number = page * per_page - 1;
+
+    const { data: queryData, error: queryError } = await query.range(from, to);
+
+    if (queryError) throw queryError;
+
+    const { count: countData, error: countError } = await count;
+
+    if (countError) throw countError;
+
+    return generateResponse(
+        {
+            rooms: queryData,
+            query: body,
+            meta: {
+                total: countData,
+                per_page,
+                page,
+            },
         },
         200,
         "success"
@@ -215,14 +311,18 @@ serve(async req => {
     }
 
     try {
-        // every request must have a valid user
-        const user = await validUser(req);
-
         if (method) {
             if (method === "GET") {
+                const testGetRoomList = handleUrlPattern(url, "/room");
+                if (testGetRoomList !== null) {
+                    return getRoomList(supabaseAdmin, parseUrlQuery(url) ?? {});
+                }
             }
 
             if (method === "POST") {
+                // every post request must be sent from a valid user
+                const user = await validUser(req);
+
                 const testRegisterRoomPlayer = handleUrlPattern(url, "/room/:room_id/player");
                 if (testRegisterRoomPlayer !== null) {
                     const room_id: string = testRegisterRoomPlayer?.pathname.groups.room_id || "";
