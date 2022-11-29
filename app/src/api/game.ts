@@ -1,10 +1,8 @@
-import { axiosSupabaseAnon } from "./lib/axios";
-
-const functionsUrl = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
+import { axiosSupabaseFunction } from "./lib/axios";
 
 export async function getGames() {
     try {
-        const response = await axiosSupabaseAnon(`${functionsUrl}/game`);
+        const response = await axiosSupabaseFunction(`/game`);
 
         return {
             data: response.data.data,
@@ -17,7 +15,7 @@ export async function getGames() {
 
 export async function getGame({ id }: { id: string }) {
     try {
-        const response = await axiosSupabaseAnon(`${functionsUrl}/game/${id}`);
+        const response = await axiosSupabaseFunction(`/game/${id}`);
 
         return {
             data: response.data.data,
