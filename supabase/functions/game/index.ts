@@ -4,41 +4,7 @@ import { supabaseAdmin } from "../_share/supabase.ts";
 
 import { corsHeaders, HttpError, handleUrlPattern, generateResponse } from "../_share/utils.ts";
 
-interface Game {
-    id: number;
-    name_zh_tw?: string;
-    min_team?: number;
-    max_team?: number;
-    team_count_step?: number;
-    min_player?: number;
-    max_player?: number;
-    player_count_step?: number;
-    available_round_seconds?: number[];
-    unique_info?: object;
-    available_to_play?: number;
-    degree_of_difficulty?: number;
-    game_intro_zh_tw?: string;
-}
-
-interface GameResponse {
-    game_id: number;
-    name_zh_tw?: string;
-    player_range?: {
-        max: number | null;
-        min: number | null;
-        step: number | null;
-    };
-    team_range?: {
-        max: number | null;
-        min: number | null;
-        step: number | null;
-    };
-    available_round_seconds?: number[];
-    unique_info?: object;
-    available_to_play?: number;
-    degree_of_difficulty?: number;
-    game_intro_zh_tw?: string;
-}
+import { TableGame, GameResponse } from "./../_share/types.ts";
 
 async function getGames(supabaseClient: any) {
     const { data: games, error: gamesError } = await supabaseClient.from("games").select(`
@@ -51,7 +17,7 @@ async function getGames(supabaseClient: any) {
   `);
     if (gamesError) throw gamesError;
 
-    const formatGames: GameResponse[] = games.map((game: Game) => {
+    const formatGames: GameResponse[] = games.map((game: TableGame) => {
         return {
             game_id: game.id,
             name_zh_tw: game.name_zh_tw,
@@ -76,7 +42,7 @@ async function getGame(supabaseClient: any, gameId: string) {
         .eq("id", Number(gameId));
     if (gamesError) throw gamesError;
 
-    const theGame: Game = game[0];
+    const theGame: TableGame = game[0];
 
     if (theGame === undefined) {
         return generateResponse(null, 404, "Game is not found");

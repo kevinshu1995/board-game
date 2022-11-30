@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
 import type { User } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+    RoomStatus,
+    RoomPlayerRole,
+    CreateRoom,
+    RoomListBody,
+    TablePlayer,
+} from "./../_share/types.ts";
 
 import { supabaseAdmin, validUser } from "../_share/supabase.ts";
 
@@ -22,43 +29,6 @@ import {
     minNumber,
     isInt,
 } from "https://deno.land/x/validasaur/mod.ts";
-
-enum RoomStatus {
-    None, // 被放棄的房間
-    processing = 0,
-    complete = 1,
-    waiting = 2,
-}
-
-enum RoomPlayerRole {
-    chief = 1,
-    player,
-    audience,
-}
-
-type Player = {
-    room_id: number;
-    user_id: number | null;
-    team_turns: number;
-    final_score: number;
-    room_role: number;
-    game_role: number | null;
-    is_winner: boolean | null;
-    is_leaving: boolean;
-    enter_time: number; // timestamp
-};
-
-type CreateRoom = {
-    game_id: number;
-    team_count: number;
-    player_count_max: number | null;
-    round_seconds?: number | null;
-    room_name?: string;
-    does_guest_can_chat?: boolean;
-    password?: string | null;
-    is_private?: boolean;
-    is_optional_game_role?: boolean;
-};
 
 // 建立房間的同時會直接註冊該玩家
 async function createNewRoom(supabaseClient: any, body: CreateRoom | null, user: User) {
@@ -170,7 +140,7 @@ async function registerUserToRoom(
     // team_turns - 1 (計算這位玩家的隊伍，依照 team_count 來分 假設有兩隊 0, 1, 0, 1)
     const team_count = gameRoomsData[0].team_count;
     // team_turns - 2 依照 players.team_turns 的值當作 index 建立一個陣列，代表隊伍人數
-    const player_team_turns: number[] = playersData.reduce((acc: number[], cur: Player) => {
+    const player_team_turns: number[] = playersData.reduce((acc: number[], cur: TablePlayer) => {
         acc[cur.team_turns] += 1;
         return acc;
     }, Array(team_count).fill(0));
@@ -207,15 +177,6 @@ async function registerUserToRoom(
         "success"
     );
 }
-
-type RoomListBody = {
-    status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete; // 要哪種狀態的房間, 沒給就是不篩選
-    is_full?: boolean; // 要哪種狀態的房間，沒給就是不篩選
-    has_password?: boolean; // 要哪種狀態的房間，沒給就是不篩選
-    per_page?: number;
-    page?: number;
-    keyword?: string; // 搜尋房間標題用
-};
 
 // 取得公開的房間列表
 // [get] api/v1/rooms - 取得全部房間 (僅能取得公開房間)

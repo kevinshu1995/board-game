@@ -1,17 +1,5 @@
 import { axiosSupabaseFunction } from "./lib/axios";
-
-// TODO refactor api 有重複使用
-type CreateRoom = {
-    game_id: number;
-    team_count: number;
-    player_count_max: number | null;
-    round_seconds?: number | null;
-    room_name?: string;
-    does_guest_can_chat?: boolean;
-    password?: string | null;
-    is_private?: boolean;
-    is_optional_game_role?: boolean;
-};
+import type { CreateRoom } from "./types";
 
 export async function setupNewRoom(body: CreateRoom) {
     try {
