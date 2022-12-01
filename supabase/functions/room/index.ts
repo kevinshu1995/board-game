@@ -178,6 +178,37 @@ async function registerUserToRoom(
     );
 }
 
+async function getRoomPlayers(supabaseClient: any, room_id: number | null = null) {
+    if (room_id === null) {
+        return generateResponse(null, 400, "Bad Request - room_id is required");
+    }
+
+    const { data: playerData, error } = await supabaseClient
+        .from("players")
+        .select()
+        .eq("room_id", room_id);
+
+    interface playerData {
+        room_id: number;
+    }
+
+    const formatFunction = <T extends playerData>(item: T): Omit<T, "room_id"> => {
+        const { room_id, ...rest } = item;
+        return rest;
+    };
+
+    const formatPlayerData = playerData.map(formatFunction);
+
+    return generateResponse(
+        {
+            players: formatPlayerData,
+            room_id,
+        },
+        200,
+        "success"
+    );
+}
+
 // 取得公開的房間列表
 // [get] api/v1/rooms - 取得全部房間 (僅能取得公開房間)
 async function getRoomList(supabaseClient: any, body: RoomListBody) {
@@ -277,6 +308,13 @@ serve(async req => {
                 const testGetRoomList = handleUrlPattern(url, "/room");
                 if (testGetRoomList !== null) {
                     return getRoomList(supabaseAdmin, parseUrlQuery(url) ?? {});
+                }
+
+                const testGetRoomPlayers = handleUrlPattern(url, "/room/:room_id/players");
+                if (testGetRoomPlayers !== null) {
+                    const room_id: string | null =
+                        testGetRoomPlayers?.pathname.groups.room_id || null;
+                    return getRoomPlayers(supabaseAdmin, Number(room_id));
                 }
             }
 
