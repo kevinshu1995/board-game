@@ -1,3 +1,5 @@
+import type { User } from "https://esm.sh/@supabase/supabase-js@2";
+
 import { RoomStatus, RoomListBody } from "./../_share/types.ts";
 import {
     required,
@@ -52,7 +54,7 @@ export async function getRoomPlayers(supabaseClient: any, room_id: number | null
 }
 
 // 取得全部房間 (僅能取得公開房間)
-export async function getRoomList(supabaseClient: any, body: RoomListBody) {
+export async function getRoomList(supabaseClient: any, body: RoomListBody, user: User | null) {
     if (body === null) {
         return generateResponse(null, 400, "Bad Request - body is required");
     }
@@ -64,28 +66,39 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody) {
         per_page: [isInt, minNumber(1)],
         page: [isInt, minNumber(1)],
         keyword: [isString],
+        get_mine_rooms: [isBool],
     });
     errorCb();
 
-    let query = supabaseClient.from("game_rooms").select();
-    let count = supabaseClient.from("game_rooms").select("*", {
+    const baseQuery = supabaseClient.from("game_rooms");
+
+    let query, count;
+    const countSelectOption = {
         count: "exact",
         head: true,
-    });
+    };
 
-    query = query.eq("is_private", false);
-    count = count.eq("is_private", false);
+    // 判斷是否要排除非使用者所在的房間
+    if (!!body.get_mine_rooms !== true || user === null) {
+        query = baseQuery.select().eq("is_private", false);
+        count = baseQuery.select("*", countSelectOption).eq("is_private", false);
+    } else {
+        query = baseQuery.select("*, players!inner(*)").eq("players.user_id", user.id);
+        count = baseQuery
+            .select("*, players!inner(*)", countSelectOption)
+            .eq("players.user_id", user.id);
+    }
 
     if (body.status !== undefined) {
         query = query.eq("status", body.status);
         count = count.eq("status", body.status);
     }
-    if (body.is_full !== undefined) {
-        query = query.eq("is_full", body.is_full);
-        count = count.eq("is_full", body.is_full);
+    if (!!body.is_full !== undefined) {
+        query = query.eq("is_full", !!body.is_full);
+        count = count.eq("is_full", !!body.is_full);
     }
     if (body.has_password !== undefined) {
-        if (body.has_password) {
+        if (!!body.has_password) {
             query = query.not("password", "is", null);
             count = count.not("password", "is", null);
         } else {

@@ -30,5 +30,6 @@ export type RoomListBody = {
     per_page?: number;
     page?: number;
     keyword?: string; // 搜尋房間標題用
+    get_mine_rooms?: boolean; // 是否只取得使用者自己的房間
 };
 

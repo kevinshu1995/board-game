@@ -21,7 +21,10 @@ export function handleUrlPattern(targetUrl: string, url: string = "") {
     return taskPattern.exec(targetUrl);
 }
 
-export function parseUrlQuery(url: string): object | null {
+interface QueryType {
+    [key: string]: string;
+}
+export function parseUrlQuery(url: string): QueryType | null {
     const { search } = new URLPattern(url);
     if (search === "") {
         return null;

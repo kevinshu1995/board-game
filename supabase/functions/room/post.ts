@@ -143,10 +143,12 @@ export async function registerUserToRoom(
 
     if (currentPlayerError) throw currentPlayerError;
 
+    const gameRoomsPlayers: string[] = gameRoomsData.players?.concat([user.id]) || [user.id];
+
     // TODO 改用 database trigger 更新 is_full
     const { error: updateGameRoomsError } = await supabaseClient
         .from("game_rooms")
-        .update({ is_full: maxPlayers <= playerCounts + 1 }) // +1 是因為 playerCounts 不包含這個新註冊的使用者
+        .update({ is_full: maxPlayers <= playerCounts + 1, players: gameRoomsPlayers }) // +1 是因為 playerCounts 不包含這個新註冊的使用者
         .eq("id", room_id);
 
     return generateResponse(

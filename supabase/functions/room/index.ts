@@ -36,7 +36,10 @@ serve(async req => {
                 // [get] /room (取得公開房間)
                 const testGetRoomList = handleUrlPattern(url, "/room");
                 if (testGetRoomList !== null) {
-                    return Get.getRoomList(supabaseAdmin, parseUrlQuery(url) ?? {});
+                    const query = parseUrlQuery(url);
+                    const get_mine_rooms = !!query?.get_mine_rooms || false;
+                    const user = get_mine_rooms ? await validUser(req) : null;
+                    return Get.getRoomList(supabaseAdmin, parseUrlQuery(url) ?? {}, user);
                 }
 
                 // [get] /room/:room_id/players (取得指定房間全部玩家)
