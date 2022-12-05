@@ -86,7 +86,9 @@ export async function registerUserToRoom(
         return generateResponse(null, 404, "Room is not found");
     }
 
-    const status = gameRoomsData[0].status;
+    const theRoom = gameRoomsData[0];
+
+    const status = theRoom.status;
 
     // 如果房間是等待狀態才可以加入
     // 如果不是等待狀態則 回傳 422 代表不能註冊成為該房間的玩家
@@ -103,7 +105,7 @@ export async function registerUserToRoom(
     if (playersError) throw playersError;
 
     const playerCounts = playersData.length;
-    const maxPlayers = gameRoomsData[0].room_player_count_limit;
+    const maxPlayers = theRoom.room_player_count_limit;
 
     // 如果人數未滿上限就可以加入
     // 如果已達上限 回傳 423 代表人數已滿
@@ -120,7 +122,7 @@ export async function registerUserToRoom(
     }
 
     // team_turns - 1 (計算這位玩家的隊伍，依照 team_count 來分 假設有兩隊 0, 1, 0, 1)
-    const team_count = gameRoomsData[0].team_count;
+    const team_count = theRoom.team_count;
     // team_turns - 2 依照 players.team_turns 的值當作 index 建立一個陣列，代表隊伍人數
     const player_team_turns: number[] = playersData.reduce((acc: number[], cur: TablePlayer) => {
         acc[cur.team_turns] += 1;
@@ -143,19 +145,23 @@ export async function registerUserToRoom(
 
     if (currentPlayerError) throw currentPlayerError;
 
-    const gameRoomsPlayers: string[] = gameRoomsData.players?.concat([user.id]) || [user.id];
+    const gameRoomsPlayers: string[] = Array.isArray(theRoom.players)
+        ? theRoom.players.concat([user.id])
+        : [user.id];
 
     // TODO 改用 database trigger 更新 is_full
-    const { error: updateGameRoomsError } = await supabaseClient
+    const { data: updateGameRoomData, error: updateGameRoomsError } = await supabaseClient
         .from("game_rooms")
         .update({ is_full: maxPlayers <= playerCounts + 1, players: gameRoomsPlayers }) // +1 是因為 playerCounts 不包含這個新註冊的使用者
-        .eq("id", room_id);
+        .eq("id", room_id)
+        .select();
+
+    if (updateGameRoomsError) throw updateGameRoomsError;
 
     return generateResponse(
         {
-            currentPlayer: currentPlayerData[0],
-            players: playersData,
-            room: gameRoomsData[0],
+            players: [...playersData, currentPlayerData[0]],
+            room: updateGameRoomData,
         },
         200,
         "success"

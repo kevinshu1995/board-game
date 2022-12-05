@@ -25,10 +25,25 @@ export async function deletePlayerInGameRoom(
 
         if (currentUserError) throw currentUserError;
 
+        if (currentUserData.length === 0) {
+            return generateResponse(null, 404, "this user or the room is not found");
+        }
+
         if (currentUserData[0].room_role !== RoomPlayerRole.chief) {
-            generateResponse(null, 403, "this user is unable to delete player in this room");
+            return generateResponse(null, 403, "this user is unable to delete player in this room");
         }
     }
+
+    const { count: targetPlayerCount, error: targetPlayerError } = await supabaseClient
+        .from("players")
+        .select("*, game_rooms!inner(*)", { count: "exact", head: true })
+        .match({ room_id: body.room_id, user_id: body.player_id });
+
+    if (targetPlayerCount === 0 || targetPlayerCount === null) {
+        return generateResponse(null, 404, "this user or the room is not found");
+    }
+
+    if (targetPlayerError) throw targetPlayerError;
 
     const { error: deletePlayersError } = await supabaseClient
         .from("players")
