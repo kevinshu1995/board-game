@@ -33,3 +33,8 @@ export type RoomListBody = {
     get_mine_rooms?: boolean; // 是否只取得使用者自己的房間
 };
 
+export type DeletePlayerBody = {
+    room_id: number | null;
+    player_id: string | null;
+};
+

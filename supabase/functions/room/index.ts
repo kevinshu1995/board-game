@@ -13,6 +13,7 @@ import {
 
 import Get from "./get.ts";
 import Post from "./post.ts";
+import Delete from "./delete.ts";
 
 serve(async req => {
     const { url, method } = req;
@@ -73,6 +74,29 @@ serve(async req => {
                 // [post] /room (建立房間)
                 if (handleUrlPattern(url, "/room") !== null) {
                     return Post.createNewRoom(supabaseAdmin, body, user);
+                }
+            }
+
+            if (method === "DELETE") {
+                const user = await validUser(req);
+
+                const testDeletePlayerInGameRoom = handleUrlPattern(
+                    url,
+                    "/room/:room_id/player/:player_id"
+                );
+                if (testDeletePlayerInGameRoom !== null) {
+                    const room_id: string | null =
+                        testDeletePlayerInGameRoom?.pathname.groups.room_id || null;
+                    const player_id: string | null =
+                        testDeletePlayerInGameRoom?.pathname.groups.player_id || null;
+                    return Delete.deletePlayerInGameRoom(
+                        supabaseAdmin,
+                        {
+                            room_id: Number(room_id),
+                            player_id,
+                        },
+                        user
+                    );
                 }
             }
             throw new HttpError("api url is not found", 404);
