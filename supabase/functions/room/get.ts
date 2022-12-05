@@ -140,8 +140,101 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     );
 }
 
+// 取得特定房間資料
+export async function getRoom(supabaseClient: any, room_id: number) {
+    const [_, __, errorCb] = await validateBody(
+        { room_id },
+        {
+            // options
+            room_id: [required, isInt],
+        }
+    );
+    errorCb();
+
+    const { data: gameRoomData, error: gameRoomError } = await supabaseClient
+        .from("game_rooms")
+        .select(
+            // 排除 password
+            `
+            id, 
+            game_id,
+            room_name,
+            created_at,
+            round_time, 
+            does_guest_can_chat, 
+            status, 
+            game_start_at, 
+            game_end_at, 
+            room_player_count_limit, 
+            is_private, 
+            is_optional_game_role, 
+            uuid, 
+            team_count, 
+            players, 
+            is_full, 
+            players!inner(*)
+            `
+        )
+        .eq("id", room_id);
+
+    if (gameRoomError) throw gameRoomError;
+
+    if (gameRoomData.length === 0) {
+        return generateResponse(null, 404, "Room is not found");
+    }
+
+    const theRoom = gameRoomData[0];
+
+    const { data: gameRoleData, error: gameRoleError } = await supabaseClient
+        .from("game_roles")
+        .select()
+        .eq("game_id", theRoom.game_id);
+
+    if (gameRoleError) throw gameRoleError;
+
+    const { data: roomRoleData, error: roomRoleError } = await supabaseClient
+        .from("room_roles")
+        .select();
+
+    if (roomRoleError) throw roomRoleError;
+
+    return generateResponse(
+        {
+            room: {
+                info: {
+                    id: theRoom.id,
+                    game_id: theRoom.game_id,
+                    uuid: theRoom.uuid,
+                    room_name: theRoom.room_name,
+                    is_full: theRoom.is_full,
+                    status: theRoom.status,
+                },
+                room_settings: {
+                    team_count: theRoom.team_count,
+                    round_time: theRoom.round_time,
+                    does_guest_can_chat: theRoom.does_guest_can_chat,
+                    room_player_count_limit: theRoom.room_player_count_limit,
+                    is_private: theRoom.is_private,
+                    is_optional_game_role: theRoom.is_optional_game_role,
+                },
+                time: {
+                    created_at: theRoom.created_at,
+                    game_start_at: theRoom.game_start_at,
+                    game_end_at: theRoom.game_end_at,
+                },
+            },
+            players: theRoom.players,
+            game_roles: gameRoleData,
+            room_roles: roomRoleData,
+        },
+        200,
+        "success"
+    );
+}
+
 export default {
     getRoomPlayers,
     getRoomList,
+    getRoom,
 };
 

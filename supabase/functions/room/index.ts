@@ -43,6 +43,13 @@ serve(async req => {
                     return Get.getRoomList(supabaseAdmin, parseUrlQuery(url) ?? {}, user);
                 }
 
+                // [get] /room/:room_id (取得指定房間資料)
+                const testGetRoom = handleUrlPattern(url, "/room/:room_id");
+                if (testGetRoom !== null) {
+                    const room_id: string | null = testGetRoom?.pathname.groups.room_id || null;
+                    return Get.getRoom(supabaseAdmin, Number(room_id));
+                }
+
                 // [get] /room/:room_id/players (取得指定房間全部玩家)
                 const testGetRoomPlayers = handleUrlPattern(url, "/room/:room_id/players");
                 if (testGetRoomPlayers !== null) {
