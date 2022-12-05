@@ -27,6 +27,16 @@ export async function getRoomPlayers(supabaseClient: any, room_id: number | null
     );
     errorCb();
 
+    const { count, error: gameRoomError } = await supabaseClient
+        .from("game_rooms")
+        .select("*", { count: "exact", head: true })
+        .eq("id", room_id);
+
+    if (gameRoomError) throw gameRoomError;
+    if (count === 0) {
+        return generateResponse(null, 404, "Room is not found");
+    }
+
     const { data: playerData, error } = await supabaseClient
         .from("players")
         .select()
