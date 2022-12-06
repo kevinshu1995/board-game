@@ -1,5 +1,5 @@
-import { axiosSupabaseFunction } from "./lib/axios";
-import type { CreateRoom } from "./types";
+import { axiosSupabaseFunction } from "../lib/axios";
+import type { CreateRoom } from "../types";
 
 export async function setupNewRoom(body: CreateRoom) {
     try {

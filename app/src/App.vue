@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { useAuth } from "@/store";
-import { getGames, getGame, setupNewRoom, registerNewPlayer } from "@/api";
+import {
+    getGames,
+    getGame,
+    setupNewRoom,
+    registerNewPlayer,
+    getPublicRooms,
+    getRoomPlayers,
+    getRoomData,
+    deletePlayerInRoom,
+} from "@/api";
 import HelloWorld from "./components/HelloWorld.vue";
 
 const auth = useAuth();
@@ -45,6 +54,39 @@ async function handleRegisterNewPlayer(room_id = 9) {
 
     console.log(data, error);
 }
+async function handleGetPublicRooms() {
+    const { data, error } = await getPublicRooms({
+        get_mine_rooms: true,
+    });
+    console.log(data, error);
+}
+
+async function handleGetRoomPlayers() {
+    const room_id = 28;
+    const { data, error } = await getRoomPlayers(room_id);
+
+    console.log(data, error);
+}
+
+async function handleGetRoomData() {
+    const room_id = 28;
+    const { data, error } = await getRoomData(room_id);
+
+    console.log(data, error);
+}
+
+async function handleDeletePlayerInRoom() {
+    if (!auth.session) {
+        return;
+    }
+
+    const room_id = 28;
+    const user_id = auth.session.user.id;
+
+    const { data, error } = await deletePlayerInRoom(room_id, user_id);
+
+    console.log(data, error);
+}
 </script>
 
 <template>
@@ -65,8 +107,18 @@ async function handleRegisterNewPlayer(room_id = 9) {
     <button @click="handleGetGames">getGames</button>
     <button @click="handleGetGame">getGame</button>
     <hr />
+    post room
     <button @click="handleSetupNewRoom">setupNewRoom</button>
     <button @click="handleRegisterNewPlayer(9)">registerNewPlayer</button>
+    <hr />
+    get room
+    <button @click="handleGetPublicRooms">getPublic rooms</button>
+    <button @click="handleGetRoomPlayers">GetRoomPlayers</button>
+    <button @click="handleGetRoomData">getRoomData</button>
+    <hr />
+    delete room
+    <button @click="handleDeletePlayerInRoom">deletePlayerInRoom</button>
+
     <HelloWorld msg="Vite + Vue" />
 </template>
 
