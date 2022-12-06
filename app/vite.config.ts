@@ -6,7 +6,11 @@ import "dotenv/config";
 export default ({ mode }) => {
     return defineConfig({
         resolve: {
-            alias: [{ find: "@", replacement: "/src" }],
+            alias: [
+                { find: "@", replacement: "/src" },
+                { find: "@view", replacement: "/src/components/view" },
+                { find: "@widget", replacement: "/src/components/widget" },
+            ],
         },
         server: {
             proxy: {
