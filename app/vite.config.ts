@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import svgLoader from "vite-svg-loader";
 import "dotenv/config";
 
 // https://vitejs.dev/config/
@@ -26,7 +27,7 @@ export default ({ mode }) => {
                 },
             },
         },
-        plugins: [vue()],
+        plugins: [vue(), svgLoader()],
     });
 };
 
