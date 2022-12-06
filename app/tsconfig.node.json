@@ -1,9 +1,15 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["vite.config.ts"]
+    "compilerOptions": {
+        "composite": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "removeComments": true,
+        "noImplicitAny": true
+    },
+    "include": ["vite.config.ts"]
 }
+
