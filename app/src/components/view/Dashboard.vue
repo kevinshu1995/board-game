@@ -1,7 +1,9 @@
 <template>
     <div class="text-xl">dashboard</div>
-    <Icon name="adjustments" class="h-6 w-6" />
+    <DarkModeBtn />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import DarkModeBtn from "@widget/button/DarkModeBtn.vue";
+</script>
 
