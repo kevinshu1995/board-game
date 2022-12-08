@@ -1,27 +1,29 @@
 <template>
-    <button @click="auth.signInWithProvider('google')">google</button>
-    <button @click="auth.signInWithProvider('facebook')">facebook</button>
-    <button @click="auth.signInWithProvider('discord')">Discord</button>
-    <button @click="auth.handleSignOut">signOut</button>
-    <button @click="updateData">update</button>
+    <Button @click="auth.signInWithProvider('google')">google</Button>
+    <Button @click="auth.signInWithProvider('facebook')">facebook</Button>
+    <Button @click="auth.signInWithProvider('discord')">Discord</Button>
+    <Button @click="auth.handleSignOut">signOut</Button>
+    <Button @click="updateData">update</Button>
     <hr />
-    <button @click="handleGetGames">getGames</button>
-    <button @click="handleGetGame">getGame</button>
+    <Button @click="handleGetGames">getGames</Button>
+    <Button @click="handleGetGame">getGame</Button>
     <hr />
     post room
-    <button @click="handleSetupNewRoom">setupNewRoom</button>
-    <button @click="handleRegisterNewPlayer(9)">registerNewPlayer</button>
+    <Button @click="handleSetupNewRoom">setupNewRoom</Button>
+    <Button @click="handleRegisterNewPlayer(9)">registerNewPlayer</Button>
     <hr />
     get room
-    <button @click="handleGetPublicRooms">getPublic rooms</button>
-    <button @click="handleGetRoomPlayers">GetRoomPlayers</button>
-    <button @click="handleGetRoomData">getRoomData</button>
+    <Button @click="handleGetPublicRooms">getPublic rooms</Button>
+    <Button @click="handleGetRoomPlayers">GetRoomPlayers</Button>
+    <Button @click="handleGetRoomData">getRoomData</Button>
     <hr />
     delete room
-    <button @click="handleDeletePlayerInRoom">deletePlayerInRoom</button>
+    <Button @click="handleDeletePlayerInRoom">deletePlayerInRoom</Button>
 </template>
 
 <script setup lang="ts">
+import Button from "@widget/button/Button.vue";
+
 import { useAuth } from "@/store";
 import {
     getGames,
@@ -110,3 +112,4 @@ async function handleDeletePlayerInRoom() {
     console.log(data, error);
 }
 </script>
+
