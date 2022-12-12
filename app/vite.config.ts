@@ -4,13 +4,14 @@ import svgLoader from "vite-svg-loader";
 import "dotenv/config";
 
 // https://vitejs.dev/config/
-export default ({ mode }) => {
+export default ({}) => {
     return defineConfig({
         resolve: {
             alias: [
                 { find: "@", replacement: "/src" },
                 { find: "@view", replacement: "/src/components/view" },
                 { find: "@widget", replacement: "/src/components/widget" },
+                { find: "@flowbite", replacement: "/node_modules/flowbite/src/flowbite" },
             ],
         },
         server: {
