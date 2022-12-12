@@ -54,23 +54,33 @@ export async function createNewRoom(supabaseClient: any, body: CreateRoom | null
     // 應該要只有一個
     const theRoom = data[0];
 
-    return registerUserToRoom(supabaseClient, theRoom.id, user, true);
+    return registerUserToRoom(
+        supabaseClient,
+        {
+            room_id: theRoom.id,
+        },
+        user,
+        true
+    );
 }
+
+type RegisterUserToRoomBody = {
+    room_id: number;
+    password?: string;
+};
 
 // 註冊加入等待房間成為玩家
 export async function registerUserToRoom(
     supabaseClient: any,
-    room_id: number | null,
+    body: RegisterUserToRoomBody,
     user: User,
     isCreator: boolean
 ) {
     // 檢查 room_id
-    const [passes, errors, errorCb] = await validateBody(
-        { room_id },
-        {
-            room_id: [required, isInt],
-        }
-    );
+    const [passes, errors, errorCb] = await validateBody(body, {
+        room_id: [required, isInt],
+        password: [isString, nullable],
+    });
 
     errorCb();
 
@@ -78,7 +88,7 @@ export async function registerUserToRoom(
     const { data: gameRoomsData, error: gameRoomsError } = await supabaseClient
         .from("game_rooms")
         .select()
-        .eq("id", room_id);
+        .eq("id", body.room_id);
 
     if (gameRoomsError) throw gameRoomsError;
 
@@ -87,6 +97,10 @@ export async function registerUserToRoom(
     }
 
     const theRoom = gameRoomsData[0];
+
+    if (theRoom.password !== null && theRoom.password !== body.password) {
+        return generateResponse(null, 403, "room's password is wrong");
+    }
 
     const status = theRoom.status;
 
@@ -100,7 +114,7 @@ export async function registerUserToRoom(
     const { data: playersData, error: playersError } = await supabaseClient
         .from("players")
         .select()
-        .eq("room_id", room_id);
+        .eq("room_id", body.room_id);
 
     if (playersError) throw playersError;
 
@@ -136,7 +150,7 @@ export async function registerUserToRoom(
         .from("players")
         .insert({
             user_id: user.id,
-            room_id,
+            room_id: body.room_id,
             team_turns: currentUserTeam,
             // 如果加入時 is_creator = true 會以房主的身份加入
             room_role: isCreator ? RoomPlayerRole.chief : RoomPlayerRole.player,
@@ -153,7 +167,7 @@ export async function registerUserToRoom(
     const { data: updateGameRoomData, error: updateGameRoomsError } = await supabaseClient
         .from("game_rooms")
         .update({ is_full: maxPlayers <= playerCounts + 1, players: gameRoomsPlayers }) // +1 是因為 playerCounts 不包含這個新註冊的使用者
-        .eq("id", room_id)
+        .eq("id", body.room_id)
         .select();
 
     if (updateGameRoomsError) throw updateGameRoomsError;

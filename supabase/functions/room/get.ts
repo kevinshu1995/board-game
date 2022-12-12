@@ -107,6 +107,8 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         query = query.eq("is_full", !!body.is_full);
         count = count.eq("is_full", !!body.is_full);
     }
+
+    // TODO password 要篩選掉，不能回傳，只用來篩選
     if (body.has_password !== undefined) {
         if (!!body.has_password) {
             query = query.not("password", "is", null);

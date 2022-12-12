@@ -58,6 +58,7 @@ serve(async req => {
                     return Get.getRoomPlayers(supabaseAdmin, Number(room_id));
                 }
 
+                // [get] /room/access/:uuid 取得指定房間是否需要密碼
                 const testGetRoomAccess = handleUrlPattern(url, "/room/access/:uuid");
                 if (testGetRoomAccess !== null) {
                     const uuid: string | null = testGetRoomAccess?.pathname.groups.uuid || null;
@@ -76,7 +77,15 @@ serve(async req => {
                     if (room_id === "") {
                         throw new HttpError("room_id is required", 400);
                     }
-                    return Post.registerUserToRoom(supabaseAdmin, Number(room_id), user, false);
+                    return Post.registerUserToRoom(
+                        supabaseAdmin,
+                        {
+                            room_id: Number(room_id),
+                            password: body?.password || null,
+                        },
+                        user,
+                        false
+                    );
                 }
 
                 // need body section below ---
