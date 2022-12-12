@@ -145,6 +145,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
                 total: countData,
                 per_page,
                 page,
+                total_page: Math.ceil(countData / per_page),
             },
         },
         200,
