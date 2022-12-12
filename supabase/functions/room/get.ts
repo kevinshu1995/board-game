@@ -242,9 +242,52 @@ export async function getRoom(supabaseClient: any, room_id: number) {
     );
 }
 
+export async function getRoomAccess(supabaseClient: any, room_uuid: string | null) {
+    const [_, __, errorCb] = await validateBody(
+        { room_uuid },
+        {
+            // options
+            room_uuid: [required, isString],
+        }
+    );
+    errorCb();
+
+    const { data: gameRoomData, error: gameRoomError } = await supabaseClient
+        .from("game_rooms")
+        .select()
+        .eq("uuid", room_uuid);
+
+    if (gameRoomError) throw gameRoomError;
+
+    if (gameRoomData.length === 0) {
+        return generateResponse(null, 404, "Room is not found");
+    }
+
+    const theRoom = gameRoomData[0];
+
+    if (theRoom.password === null) {
+        return generateResponse(
+            {
+                needPassword: false,
+            },
+            200,
+            "This room is available"
+        );
+    }
+
+    return generateResponse(
+        {
+            needPassword: true,
+        },
+        200,
+        "This room need password to access"
+    );
+}
+
 export default {
     getRoomPlayers,
     getRoomList,
     getRoom,
+    getRoomAccess,
 };
 

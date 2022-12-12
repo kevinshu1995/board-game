@@ -57,6 +57,12 @@ serve(async req => {
                         testGetRoomPlayers?.pathname.groups.room_id || null;
                     return Get.getRoomPlayers(supabaseAdmin, Number(room_id));
                 }
+
+                const testGetRoomAccess = handleUrlPattern(url, "/room/access/:uuid");
+                if (testGetRoomAccess !== null) {
+                    const uuid: string | null = testGetRoomAccess?.pathname.groups.uuid || null;
+                    return Get.getRoomAccess(supabaseAdmin, uuid);
+                }
             }
 
             if (method === "POST") {
