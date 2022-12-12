@@ -8,7 +8,6 @@ import {
     handleUrlPattern,
     parseUrlQuery,
     generateResponse,
-    validateBody,
 } from "../_share/utils.ts";
 
 import Get from "./get.ts";

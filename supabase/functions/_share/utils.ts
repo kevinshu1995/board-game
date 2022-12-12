@@ -22,8 +22,22 @@ export function handleUrlPattern(targetUrl: string, url: string = "") {
 }
 
 interface QueryType {
-    [key: string]: string;
+    [key: string]: string | boolean | number;
 }
+
+function parseValue(v: string): string | number | boolean {
+    if (v === "") {
+        return true;
+    } else if (v === "true") {
+        return true;
+    } else if (v === "false") {
+        return false;
+    } else if (!isNaN(Number(v))) {
+        return +v;
+    }
+    return v;
+}
+
 export function parseUrlQuery(url: string): QueryType | null {
     const { search } = new URLPattern(url);
     if (search === "") {
@@ -33,7 +47,7 @@ export function parseUrlQuery(url: string): QueryType | null {
         const [key, value] = curr.split("=");
         return {
             ...query,
-            [key]: value,
+            [key]: parseValue(value),
         };
     }, {});
 }
@@ -48,21 +62,22 @@ export const generateResponse = (data: any, status: number, message: string) =>
         status,
     });
 
-type ValidateBody = (
-    body: object,
-    rules: object
-) => Promise<[passes: boolean, errors: object, errorCb: () => void]>;
+type ValidateBody = (body: object, rules: object) => Promise<{ isPass: boolean; response: any }>;
 
 export const validateBody: ValidateBody = async (body, rules) => {
     const [passes, errors] = await validate(body, { ...rules });
 
-    function errorCb() {
-        if (passes === false) {
-            const errorMsg = Object.values(firstMessages(errors)).join(", ");
-            return generateResponse(null, 400, `Bad Request - ${errorMsg}`);
-        }
+    if (passes === false) {
+        const errorMsg = Object.values(firstMessages(errors)).join(", ");
+        return {
+            isPass: false,
+            response: generateResponse(null, 400, `Bad Request - ${errorMsg}`),
+        };
     }
 
-    return [passes, errors, errorCb];
+    return {
+        isPass: true,
+        response: null,
+    };
 };
 

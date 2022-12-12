@@ -18,14 +18,14 @@ export async function getRoomPlayers(supabaseClient: any, room_id: number | null
         return generateResponse(null, 400, "Bad Request - room_id is required");
     }
 
-    const [passes, errors, errorCb] = await validateBody(
+    const { isPass, response } = await validateBody(
         { room_id },
         {
             // options
             room_id: [required, isInt],
         }
     );
-    errorCb();
+    if (!isPass) return response;
 
     const { count, error: gameRoomError } = await supabaseClient
         .from("game_rooms")
@@ -68,7 +68,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     if (body === null) {
         return generateResponse(null, 400, "Bad Request - body is required");
     }
-    const [passes, errors, errorCb] = await validateBody(body, {
+    const { isPass, response } = await validateBody(body, {
         // options
         status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete]),
         is_full: [isBool],
@@ -78,7 +78,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         keyword: [isString],
         get_mine_rooms: [isBool],
     });
-    errorCb();
+    if (!isPass) return response;
 
     const baseQuery = supabaseClient.from("game_rooms");
 
@@ -154,14 +154,14 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
 
 // 取得特定房間資料
 export async function getRoom(supabaseClient: any, room_id: number) {
-    const [_, __, errorCb] = await validateBody(
+    const { isPass, response } = await validateBody(
         { room_id },
         {
             // options
             room_id: [required, isInt],
         }
     );
-    errorCb();
+    if (!isPass) return response;
 
     const { data: gameRoomData, error: gameRoomError } = await supabaseClient
         .from("game_rooms")
@@ -245,14 +245,14 @@ export async function getRoom(supabaseClient: any, room_id: number) {
 }
 
 export async function getRoomAccess(supabaseClient: any, room_uuid: string | null) {
-    const [_, __, errorCb] = await validateBody(
+    const { isPass, response } = await validateBody(
         { room_uuid },
         {
             // options
             room_uuid: [required, isString],
         }
     );
-    errorCb();
+    if (!isPass) return response;
 
     const { data: gameRoomData, error: gameRoomError } = await supabaseClient
         .from("game_rooms")

@@ -17,7 +17,7 @@ export async function createNewRoom(supabaseClient: any, body: CreateRoom | null
     if (body === null) {
         return generateResponse(null, 400, "Bad Request - body is required");
     }
-    const [passes, errors, errorCb] = await validateBody(body, {
+    const { isPass, response } = await validateBody(body, {
         // required
         game_id: [required, isInt],
         team_count: [required, isInt],
@@ -30,7 +30,7 @@ export async function createNewRoom(supabaseClient: any, body: CreateRoom | null
         is_private: [isBool],
         is_optional_game_role: [isBool],
     });
-    errorCb();
+    if (!isPass) return response;
 
     const insertBody = {
         game_id: body.game_id,
@@ -77,12 +77,11 @@ export async function registerUserToRoom(
     isCreator: boolean
 ) {
     // 檢查 room_id
-    const [passes, errors, errorCb] = await validateBody(body, {
+    const { isPass, response } = await validateBody(body, {
         room_id: [required, isInt],
         password: [isString, nullable],
     });
-
-    errorCb();
+    if (!isPass) return response;
 
     // 取得該房間資訊
     const { data: gameRoomsData, error: gameRoomsError } = await supabaseClient
@@ -98,8 +97,11 @@ export async function registerUserToRoom(
 
     const theRoom = gameRoomsData[0];
 
-    if (theRoom.password !== null && theRoom.password !== body.password) {
-        return generateResponse(null, 403, "room's password is wrong");
+    // 不是建立者才需要檢查
+    if (isCreator === false) {
+        if (theRoom.password !== null && theRoom.password !== body.password) {
+            return generateResponse(null, 403, "room's password is wrong");
+        }
     }
 
     const status = theRoom.status;

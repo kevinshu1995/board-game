@@ -9,11 +9,12 @@ export async function deletePlayerInGameRoom(
     body: DeletePlayerBody,
     user: User
 ) {
-    const [passes, errors, errorCb] = await validateBody(body, {
+    const { isPass, response } = await validateBody(body, {
         room_id: [required, isInt],
         player_id: [required, isString],
     });
-    errorCb();
+
+    if (!isPass) return response;
 
     if (user.id !== body.player_id) {
         // 確認 user 是不是房長，不是的話就回傳 403 (只有房長可以刪除別人)
