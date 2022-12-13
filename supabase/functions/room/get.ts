@@ -80,23 +80,43 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     });
     if (!isPass) return response;
 
-    const baseQuery = supabaseClient.from("game_rooms");
+    let query = supabaseClient.from("game_rooms");
+    let count = supabaseClient.from("game_rooms");
 
-    let query, count;
     const countSelectOption = {
         count: "exact",
         head: true,
     };
 
+    // every column exclude password
+    const queryColumns = [
+        "id",
+        "game_id",
+        "room_name",
+        "created_at",
+        "round_time",
+        "does_guest_can_chat",
+        "status",
+        "game_start_at",
+        "game_end_at",
+        "room_player_count_limit",
+        "is_private",
+        "is_optional_game_role",
+        "uuid",
+        "team_count",
+        "room_players:players",
+        "is_full",
+    ];
+
     // 判斷是否要排除非使用者所在的房間
     if (!!body.get_mine_rooms !== true || user === null) {
-        query = baseQuery.select().eq("is_private", false);
-        count = baseQuery.select("*", countSelectOption).eq("is_private", false);
+        const joinedQuery = queryColumns.join(", ");
+        query = query.select(joinedQuery).eq("is_private", false);
+        count = count.select(joinedQuery, countSelectOption).eq("is_private", false);
     } else {
-        query = baseQuery.select("*, players!inner(*)").eq("players.user_id", user.id);
-        count = baseQuery
-            .select("*, players!inner(*)", countSelectOption)
-            .eq("players.user_id", user.id);
+        const joinedQuery = queryColumns.concat(["players!inner(*)"]).join(", ");
+        query = query.select(joinedQuery).eq("players.user_id", user.id);
+        count = count.select(joinedQuery, countSelectOption).eq("players.user_id", user.id);
     }
 
     if (body.status !== undefined) {
@@ -108,7 +128,6 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         count = count.eq("is_full", !!body.is_full);
     }
 
-    // TODO password 要篩選掉，不能回傳，只用來篩選
     if (body.has_password !== undefined) {
         if (!!body.has_password) {
             query = query.not("password", "is", null);
@@ -118,6 +137,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
             count = count.is("password", null);
         }
     }
+
     if (body.keyword !== undefined) {
         query = query.textSearch("room_name", body.keyword);
         count = count.textSearch("room_name", body.keyword);
@@ -130,6 +150,8 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     const to: number = page * per_page - 1;
 
     const { data: queryData, error: queryError } = await query.range(from, to);
+
+    console.log("query data", queryData);
 
     if (queryError) throw queryError;
 
