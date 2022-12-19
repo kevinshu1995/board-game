@@ -4,7 +4,7 @@ const routes = [
     {
         path: "/",
         name: "Home",
-        component: () => import("@/components/view/Dashboard.vue"),
+        component: () => import("@/components/view/Dashboard/Dashboard.vue"),
     },
     {
         path: "/api-list",
