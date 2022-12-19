@@ -24,12 +24,12 @@ export type CreateRoom = {
 };
 
 export type RoomListBody = {
-    status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete; // 要哪種狀態的房間, 沒給就是不篩選
-    is_full?: boolean; // 要哪種狀態的房間，沒給就是不篩選
-    has_password?: boolean; // 要哪種狀態的房間，沒給就是不篩選
-    per_page?: number;
+    status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete | null; // 要哪種狀態的房間, 沒給就是不篩選
+    is_full?: boolean | null; // 要哪種狀態的房間，沒給就是不篩選
+    has_password?: boolean | null; // 要哪種狀態的房間，沒給就是不篩選
+    per_page?: number | null;
     page?: number;
-    keyword?: string; // 搜尋房間標題用
+    keyword?: string | null; // 搜尋房間標題用
     get_mine_rooms?: boolean; // 是否只取得使用者自己的房間
 };
 

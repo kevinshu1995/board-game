@@ -8,6 +8,7 @@ import {
     isIn,
     minNumber,
     isInt,
+    nullable,
 } from "https://deno.land/x/validasaur/mod.ts";
 
 import { generateResponse, validateBody } from "../_share/utils.ts";
@@ -70,12 +71,12 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     }
     const { isPass, response } = await validateBody(body, {
         // options
-        status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete]),
-        is_full: [isBool],
-        has_password: [isBool],
-        per_page: [isInt, minNumber(1)],
-        page: [isInt, minNumber(1)],
-        keyword: [isString],
+        status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete, null]),
+        is_full: [isBool, nullable],
+        has_password: [isBool, nullable],
+        per_page: [isInt, minNumber(1), nullable],
+        page: [isInt, minNumber(1), nullable],
+        keyword: [isString, nullable],
         get_mine_rooms: [isBool],
     });
     if (!isPass) return response;
@@ -119,16 +120,16 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         count = count.select(joinedQuery, countSelectOption).eq("players.user_id", user.id);
     }
 
-    if (body.status !== undefined) {
+    if (body.status !== undefined && body.status !== null) {
         query = query.eq("status", body.status);
         count = count.eq("status", body.status);
     }
-    if (!!body.is_full !== undefined) {
+    if (!!body.is_full !== undefined && body.is_full !== null) {
         query = query.eq("is_full", !!body.is_full);
         count = count.eq("is_full", !!body.is_full);
     }
 
-    if (body.has_password !== undefined) {
+    if (body.has_password !== undefined && body.has_password !== null) {
         if (!!body.has_password) {
             query = query.not("password", "is", null);
             count = count.not("password", "is", null);
@@ -138,7 +139,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         }
     }
 
-    if (body.keyword !== undefined) {
+    if (body.keyword !== undefined && body.keyword !== null) {
         query = query.textSearch("room_name", body.keyword);
         count = count.textSearch("room_name", body.keyword);
     }
