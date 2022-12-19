@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import BasicDropdown from "@widget/dropdown/Basic.vue";
 import BasicNavbar from "@widget/navbar/Basic.vue";
-import DarkModeBtn from "@widget/button/DarkModeBtn.vue";
+import { DarkModeBtn } from "@widget/button";
 
 const navLinks = [
     {

@@ -14,7 +14,13 @@
         "skipLibCheck": true,
         "noEmit": true,
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@view/*": ["./src/components/view/*"],
+            "@widget/*": ["./src/components/widget/*"],
+            "@composable/*": ["./src/lib/composable/*"],
+            "@composable": ["./src/lib/composable"],
+            "@utils/*": ["./src/lib/utils/*"],
+            "@utils": ["./src/lib/utils"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

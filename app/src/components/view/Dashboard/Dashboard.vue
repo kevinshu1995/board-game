@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, toRaw } from "vue";
 import { getGames, getPublicRooms } from "@/api";
-import { useAsyncLocalState } from "@/lib/composable";
+import { useAsyncLocalState } from "@composable";
 
 const {
     state: publicRoomListState,

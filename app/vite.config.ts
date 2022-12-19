@@ -11,6 +11,8 @@ export default ({}) => {
                 { find: "@", replacement: "/src" },
                 { find: "@view", replacement: "/src/components/view" },
                 { find: "@widget", replacement: "/src/components/widget" },
+                { find: "@composable", replacement: "/src/lib/composable" },
+                { find: "@utils", replacement: "/src/lib/utils" },
                 { find: "@flowbite", replacement: "/node_modules/flowbite/src/flowbite" },
             ],
         },

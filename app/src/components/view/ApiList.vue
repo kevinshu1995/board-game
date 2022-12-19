@@ -1,28 +1,28 @@
 <template>
-    <Button @click="auth.signInWithProvider('google')">google</Button>
-    <Button @click="auth.signInWithProvider('facebook')">facebook</Button>
-    <Button @click="auth.signInWithProvider('discord')">Discord</Button>
-    <Button @click="auth.handleSignOut">signOut</Button>
-    <Button @click="updateData">update</Button>
+    <BaseButton @click="auth.signInWithProvider('google')">google</BaseButton>
+    <BaseButton @click="auth.signInWithProvider('facebook')">facebook</BaseButton>
+    <BaseButton @click="auth.signInWithProvider('discord')">Discord</BaseButton>
+    <BaseButton @click="auth.handleSignOut">signOut</BaseButton>
+    <BaseButton @click="updateData">update</BaseButton>
     <hr />
-    <Button @click="handleGetGames">getGames</Button>
-    <Button @click="handleGetGame">getGame</Button>
+    <BaseButton @click="handleGetGames">getGames</BaseButton>
+    <BaseButton @click="handleGetGame">getGame</BaseButton>
     <hr />
     post room
-    <Button @click="handleSetupNewRoom">setupNewRoom</Button>
-    <Button @click="handleRegisterNewPlayer(9)">registerNewPlayer</Button>
+    <BaseButton @click="handleSetupNewRoom">setupNewRoom</BaseButton>
+    <BaseButton @click="handleRegisterNewPlayer(9)">registerNewPlayer</BaseButton>
     <hr />
     get room
-    <Button @click="handleGetPublicRooms">getPublic rooms</Button>
-    <Button @click="handleGetRoomPlayers">GetRoomPlayers</Button>
-    <Button @click="handleGetRoomData">getRoomData</Button>
+    <BaseButton @click="handleGetPublicRooms">getPublic rooms</BaseButton>
+    <BaseButton @click="handleGetRoomPlayers">GetRoomPlayers</BaseButton>
+    <BaseButton @click="handleGetRoomData">getRoomData</BaseButton>
     <hr />
     delete room
-    <Button @click="handleDeletePlayerInRoom">deletePlayerInRoom</Button>
+    <BaseButton @click="handleDeletePlayerInRoom">deletePlayerInRoom</BaseButton>
 </template>
 
 <script setup lang="ts">
-import Button from "@widget/button/Button.vue";
+import { BaseButton } from "@widget/button";
 
 import { useAuth } from "@/store";
 import {
