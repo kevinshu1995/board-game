@@ -70,7 +70,7 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         return generateResponse(null, 400, "Bad Request - body is required");
     }
     const { isPass, response } = await validateBody(body, {
-        // options
+        game_id: [isInt, nullable],
         status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete, null]),
         is_full: [isBool, nullable],
         has_password: [isBool, nullable],
@@ -120,10 +120,16 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
         count = count.select(joinedQuery, countSelectOption).eq("players.user_id", user.id);
     }
 
+    if (body.game_id !== undefined && body.game_id !== null) {
+        query = query.eq("game_id", body.game_id);
+        count = count.eq("game_id", body.game_id);
+    }
+
     if (body.status !== undefined && body.status !== null) {
         query = query.eq("status", body.status);
         count = count.eq("status", body.status);
     }
+
     if (!!body.is_full !== undefined && body.is_full !== null) {
         query = query.eq("is_full", !!body.is_full);
         count = count.eq("is_full", !!body.is_full);

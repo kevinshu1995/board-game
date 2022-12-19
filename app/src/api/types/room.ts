@@ -24,6 +24,7 @@ export type CreateRoom = {
 };
 
 export type RoomListBody = {
+    game_id?: number | null;
     status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete | null; // 要哪種狀態的房間, 沒給就是不篩選
     is_full?: boolean | null; // 要哪種狀態的房間，沒給就是不篩選
     has_password?: boolean | null; // 要哪種狀態的房間，沒給就是不篩選
