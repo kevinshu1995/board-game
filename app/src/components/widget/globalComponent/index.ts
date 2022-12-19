@@ -1,5 +1,5 @@
 import type { Component } from "vue";
-import Icon from "./Icon.vue";
+import Icon from "./BaseIcon.vue";
 
 type GlobalComponents = {
     [key: string]: Component;

@@ -1,5 +1,5 @@
-import Navbar from "./Navbar.vue";
-import Sidebar from "./Sidebar.vue";
+import TheNavbar from "./TheNavbar.vue";
+import TheSidebar from "./TheSidebar.vue";
 
-export { Navbar, Sidebar };
+export { TheNavbar, TheSidebar };
 

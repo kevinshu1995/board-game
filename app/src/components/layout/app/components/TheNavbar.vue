@@ -1,5 +1,5 @@
 <template>
-    <BasicNavbar :link="navLinks">
+    <BaseNavbar :link="navLinks">
         <template #logo>
             <RouterLink to="/" class="flex items-center">
                 <img
@@ -66,12 +66,12 @@
                 </template>
             </BasicDropdown>
         </template>
-    </BasicNavbar>
+    </BaseNavbar>
 </template>
 
 <script setup lang="ts">
-import BasicDropdown from "@widget/dropdown/Basic.vue";
-import BasicNavbar from "@widget/navbar/Basic.vue";
+import BasicDropdown from "@/components/widget/dropdown/BaseDropdown.vue";
+import BaseNavbar from "@/components/widget/navbar/BaseNavbar.vue";
 import { DarkModeBtn } from "@widget/button";
 
 const navLinks = [
