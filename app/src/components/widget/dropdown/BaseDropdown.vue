@@ -3,7 +3,9 @@
         <button
             type="button"
             :class="[
-                'flex mr-3 text-sm md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 dark:text-white',
+                theme(),
+                'focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 dark:text-white',
+                'flex mr-3 text-sm md:mr-0',
                 dropdownStyle.trigger,
             ]"
             ref="dropdownTriggerEl"
@@ -21,6 +23,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
+import { themeTypes, getTheme } from "@utils";
 import Flowbite from "@flowbite";
 
 type DropdownOption = {
@@ -43,11 +46,15 @@ type DropdownOption = {
 
 interface Props extends DropdownOption {
     customStyle?: "normal" | "round";
-    theme?: "light";
+    theme?: themeTypes.theme;
 }
 
 const props = defineProps<Props>();
 const emits = defineEmits(["dropdown"]);
+
+const theme = () => {
+    return getTheme(props.theme || "light");
+};
 
 const dropdownStyle = computed(() => {
     const getTriggerStyle = () => {
