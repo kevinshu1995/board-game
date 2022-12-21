@@ -69,6 +69,9 @@ export async function getRoomList(supabaseClient: any, body: RoomListBody, user:
     if (body === null) {
         return generateResponse(null, 400, "Bad Request - body is required");
     }
+    if (body.keyword !== undefined) {
+        body.keyword = body.keyword === null ? null : String(body.keyword);
+    }
     const { isPass, response } = await validateBody(body, {
         game_id: [isInt, nullable],
         status: isIn([RoomStatus.processing, RoomStatus.waiting, RoomStatus.complete, null]),
