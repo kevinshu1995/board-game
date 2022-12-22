@@ -5,6 +5,13 @@ export enum RoomStatus {
     waiting = 2,
 }
 
+export enum RoomStatusZhTw {
+    None, // 被放棄的房間
+    processing = "進行中",
+    complete = "已結束",
+    waiting = "等待中",
+}
+
 export enum RoomPlayerRole {
     chief = 1,
     player,
