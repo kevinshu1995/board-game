@@ -5,6 +5,17 @@
         <div>isReady: {{ isReadyPublicRoomList }}</div>
         <div>isLoading: {{ isLoadingPublicRoomList }}</div> -->
 
+        <div>
+            <div>
+                <!-- TODO open modal (button) -->
+                輸入房間號碼
+            </div>
+            <div>
+                <!-- TODO open modal (button) -->
+                建立新遊戲
+            </div>
+        </div>
+
         <div class="space-y-4">
             <!-- Query form -->
             <div class="space-y-2">
@@ -16,7 +27,6 @@
                         v-model:value-model="publicRoomQuery.keyword"
                     />
 
-                    <!-- <CollapsedForm :games="games" v-model:form="publicRoomQuery" /> -->
                     <BaseDropdown custom-style="round" theme="light-n-border">
                         <template #trigger>
                             <div class="p-2">
@@ -30,24 +40,56 @@
                         </template>
                     </BaseDropdown>
                 </div>
-                <p>Current query -></p>
             </div>
-            <div>room cards</div>
-            <div>pagination</div>
+            <div>
+                <div>
+                    <ul v-if="publicRoomListState.rooms.length > 0" class="grid grid-cols-2 gap-4">
+                        <li v-for="room in publicRoomListState.rooms" :key="room.id">
+                            <BaseCard
+                                tag="routerLink"
+                                padding="p-2"
+                                :to="{ name: 'WaitingRoom', params: { room_id: room.uuid } }"
+                            >
+                                <div>
+                                    <p>Game Name: {{ getGameDetail(room.game_id)?.name_zh_tw }}</p>
+                                    <p>Room Full: {{ room.is_full }}</p>
+                                    <p>Room Name: {{ room.room_name }}</p>
+                                    <p>
+                                        Player: {{ room.room_players.length }} /
+                                        {{ room.room_player_count_limit }}
+                                    </p>
+                                    <p>Room Status: {{ room.status }}</p>
+                                </div>
+                            </BaseCard>
+                        </li>
+                    </ul>
+                    <div v-else>沒有資料</div>
+                </div>
+            </div>
+
+            <BasePagination
+                :total="publicRoomListState.meta.total ?? 0"
+                :page="publicRoomQuery.page"
+                :page-size="publicRoomQuery.per_page ?? 0"
+                :on-page-change="onPaginationPageChange"
+            />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, toRaw, watch } from "vue";
+import { onMounted, ref, reactive, toRaw } from "vue";
+import type { Ref } from "vue";
 import { watchThrottled } from "@vueuse/core";
 
 import { getGames, getPublicRooms } from "@/api";
 import { useAsyncLocalState } from "@composable";
-import { RoomListBody } from "@/api/types";
+import { RoomListBody, GameResponse } from "@/api/types";
 import BaseDropdown from "@widget/dropdown/BaseDropdown.vue";
 import BaseSearchInput from "@widget/form/searchInput/BaseSearchInput.vue";
 import CollapsedForm from "./components/CollapsedForm.vue";
+import BaseCard from "@widget/card/BaseCard.vue";
+import BasePagination from "@widget/pagination/BasePagination.vue";
 
 type PublicRoomQuery = Required<RoomListBody>;
 
@@ -62,7 +104,7 @@ const {
     apiPromise: handleGetPublicRooms,
 });
 
-const games = ref([]);
+const games: Ref<GameResponse[]> = ref([]);
 
 const publicRoomQuery: PublicRoomQuery = reactive({
     game_id: null,
@@ -74,6 +116,10 @@ const publicRoomQuery: PublicRoomQuery = reactive({
     page: 1,
     keyword: null,
 });
+
+function getGameDetail(game_id: number): GameResponse | null {
+    return games.value.find((game: GameResponse) => game.game_id === game_id) ?? null;
+}
 
 async function handleGetGames() {
     const { data, error } = await getGames();
@@ -114,6 +160,10 @@ async function handleGetPublicRooms() {
         return [];
     }
     return data;
+}
+
+function onPaginationPageChange(page: number) {
+    publicRoomQuery.page = page;
 }
 
 onMounted(async () => {
