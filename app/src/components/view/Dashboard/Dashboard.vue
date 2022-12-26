@@ -42,29 +42,12 @@
                 </div>
             </div>
             <div>
-                <div>
-                    <ul v-if="publicRoomListState.rooms.length > 0" class="grid grid-cols-2 gap-4">
-                        <li v-for="room in publicRoomListState.rooms" :key="room.id">
-                            <BaseCard
-                                tag="routerLink"
-                                padding="p-2"
-                                :to="{ name: 'WaitingRoom', params: { room_id: room.uuid } }"
-                            >
-                                <div>
-                                    <p>Game Name: {{ getGameDetail(room.game_id)?.name_zh_tw }}</p>
-                                    <p>Room Full: {{ room.is_full }}</p>
-                                    <p>Room Name: {{ room.room_name }}</p>
-                                    <p>
-                                        Player: {{ room.room_players.length }} /
-                                        {{ room.room_player_count_limit }}
-                                    </p>
-                                    <p>Room Status: {{ room.status }}</p>
-                                </div>
-                            </BaseCard>
-                        </li>
-                    </ul>
-                    <div v-else>沒有資料</div>
-                </div>
+                <RoomCards
+                    :rooms="publicRoomListState.rooms"
+                    :games="games"
+                    :isLoading="isLoadingPublicRoomList"
+                    :isReady="isReadyPublicRoomList"
+                />
             </div>
 
             <BasePagination
@@ -88,8 +71,8 @@ import { RoomListBody, GameResponse } from "@/api/types";
 import BaseDropdown from "@widget/dropdown/BaseDropdown.vue";
 import BaseSearchInput from "@widget/form/searchInput/BaseSearchInput.vue";
 import CollapsedForm from "./components/CollapsedForm.vue";
-import BaseCard from "@widget/card/BaseCard.vue";
 import BasePagination from "@widget/pagination/BasePagination.vue";
+import RoomCards from "./components/RoomCards.vue";
 
 type PublicRoomQuery = Required<RoomListBody>;
 
@@ -116,10 +99,6 @@ const publicRoomQuery: PublicRoomQuery = reactive({
     page: 1,
     keyword: null,
 });
-
-function getGameDetail(game_id: number): GameResponse | null {
-    return games.value.find((game: GameResponse) => game.game_id === game_id) ?? null;
-}
 
 async function handleGetGames() {
     const { data, error } = await getGames();

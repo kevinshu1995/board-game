@@ -30,6 +30,9 @@ export type CreateRoom = {
     is_optional_game_role?: boolean;
 };
 
+// TODO room
+// export type Room = {}
+
 export type RoomListBody = {
     game_id?: number | null;
     status?: RoomStatus.processing | RoomStatus.waiting | RoomStatus.complete | null; // 要哪種狀態的房間, 沒給就是不篩選
