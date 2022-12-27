@@ -146,7 +146,6 @@ function onPaginationPageChange(page: number) {
 
 onMounted(async () => {
     handleGetGames();
-    executePublicRoomListState();
 });
 
 watchThrottled(
@@ -156,6 +155,7 @@ watchThrottled(
     },
     {
         throttle: 1000,
+        // it will still be triggered after handleGetGames firing while onMounted phrase
         immediate: false,
     }
 );
