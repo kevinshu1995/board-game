@@ -1,6 +1,6 @@
 import type { BaseButtonTheme, BaseButtonShape } from "@widget/button/types";
 
-export type size =
+export type Size =
     | "max-w-xs"
     | "max-w-sm"
     | "max-w-md"
@@ -10,32 +10,39 @@ export type size =
     | "max-w-3xl"
     | "max-w-4xl";
 
-export type isClickBackdropClose = boolean;
-export type isShowCloseBtn = boolean;
-export type placement = string;
-export type isNeedToggleBtn = boolean;
-export type closeBtnPlacement = "left" | "right";
-export type closeBtnGap = string;
-export type toggleBtnTheme = BaseButtonTheme;
-export type toggleBtnShape = BaseButtonShape;
-export type toggleBtnText = string;
-export type onHide = () => void;
-export type onShow = () => void;
-export type onToggle = () => void;
+export type IsClickBackdropClose = boolean;
+export type IsShowCloseBtn = boolean;
+export type Placement = string;
+export type IsNeedToggleBtn = boolean;
+export type CloseBtnPlacement = "left" | "right";
+export type CloseBtnGap = string;
+export type ToggleBtnTheme = BaseButtonTheme;
+export type ToggleBtnShape = BaseButtonShape;
+export type ToggleBtnText = string;
+export type OnHide = () => void;
+export type OnShow = () => void;
+export type OnToggle = () => void;
+
+export type ModalInstance = {
+    toggle: () => void;
+    show: () => void;
+    hide: () => void;
+    isHidden: () => void;
+};
 
 export interface BaseModalTemplateProps {
-    size?: size;
-    isClickBackdropClose?: isClickBackdropClose;
-    isShowCloseBtn?: isShowCloseBtn;
-    placement?: placement;
-    isNeedToggleBtn?: isNeedToggleBtn;
-    closeBtnPlacement?: closeBtnPlacement;
-    closeBtnGap?: closeBtnGap;
-    toggleBtnTheme?: toggleBtnTheme;
-    toggleBtnShape?: toggleBtnShape;
-    toggleBtnText?: toggleBtnText;
-    onHide?: onHide;
-    onShow?: onShow;
-    onToggle?: onToggle;
+    size?: Size;
+    isClickBackdropClose?: IsClickBackdropClose;
+    isShowCloseBtn?: IsShowCloseBtn;
+    placement?: Placement;
+    isNeedToggleBtn?: IsNeedToggleBtn;
+    closeBtnPlacement?: CloseBtnPlacement;
+    closeBtnGap?: CloseBtnGap;
+    toggleBtnTheme?: ToggleBtnTheme;
+    toggleBtnShape?: ToggleBtnShape;
+    toggleBtnText?: ToggleBtnText;
+    onHide?: OnHide;
+    onShow?: OnShow;
+    onToggle?: OnToggle;
 }
 

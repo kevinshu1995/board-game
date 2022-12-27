@@ -64,7 +64,7 @@
 import { ref, onMounted, computed } from "vue";
 import Flowbite from "@flowbite";
 import BaseButton from "@widget/button/BaseButton.vue";
-import type { BaseModalTemplateProps } from "./types";
+import type { BaseModalTemplateProps, ModalInstance } from "./types";
 import {
     BaseModalTemplateDefaultProps as pd,
     baseModalTemplatePropValidator,
@@ -94,12 +94,7 @@ baseModalTemplatePropValidator(props);
 
 // set the modal menu element
 const modalEl = ref(null);
-const modalInstance = ref<Partial<{
-    toggle: () => void;
-    show: () => void;
-    hide: () => void;
-    isHidden: () => void;
-}> | null>(null);
+const modalInstance = ref<ModalInstance | null>(null);
 
 // options with default values
 const options = {
@@ -135,7 +130,9 @@ const closeBtnPlacementClass = computed(() => {
 
 onMounted(() => {
     modalInstance.value = new Flowbite.Modal(modalEl.value, options);
-    emit("modal", modalInstance);
+    if (modalInstance.value !== null) {
+        emit("modal", modalInstance.value);
+    }
 });
 </script>
 
