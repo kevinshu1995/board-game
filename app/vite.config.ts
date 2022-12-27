@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import svgLoader from "vite-svg-loader";
 import "dotenv/config";
+import VueMacros from "unplugin-vue-macros/vite";
 
 // https://vitejs.dev/config/
 export default ({}) => {
@@ -30,7 +31,15 @@ export default ({}) => {
                 },
             },
         },
-        plugins: [vue(), svgLoader()],
+        plugins: [
+            VueMacros({
+                plugins: {
+                    vue: vue(),
+                },
+            }),
+            // vue(),
+            svgLoader(),
+        ],
     });
 };
 
