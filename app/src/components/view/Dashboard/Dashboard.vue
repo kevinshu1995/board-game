@@ -43,7 +43,7 @@
             </div>
             <div>
                 <RoomCards
-                    :rooms="publicRoomListState.rooms"
+                    :rooms="publicRoomListState.rooms ?? []"
                     :games="games"
                     :isLoading="isLoadingPublicRoomList"
                     :isReady="isReadyPublicRoomList"
@@ -51,8 +51,8 @@
             </div>
 
             <BasePagination
-                :total="publicRoomListState.meta.total ?? 0"
-                :page="publicRoomQuery.page"
+                :total="publicRoomListState?.meta?.total ?? 0"
+                :page="publicRoomQuery?.page"
                 :page-size="publicRoomQuery.per_page ?? 0"
                 :on-page-change="onPaginationPageChange"
             />
