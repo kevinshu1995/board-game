@@ -70,9 +70,8 @@ import { useAsyncLocalState } from "@composable";
 import { RoomListBody, GameResponse } from "@/api/types";
 import BaseDropdown from "@widget/dropdown/BaseDropdown.vue";
 import BaseSearchInput from "@widget/form/searchInput/BaseSearchInput.vue";
-import CollapsedForm from "./components/CollapsedForm.vue";
 import BasePagination from "@widget/pagination/BasePagination.vue";
-import RoomCards from "./components/RoomCards.vue";
+import { CollapsedForm, RoomCards } from "./components";
 
 type PublicRoomQuery = Required<RoomListBody>;
 
