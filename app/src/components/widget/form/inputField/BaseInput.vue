@@ -1,6 +1,7 @@
 <template>
     <input
         type="text"
+        :id="props.id"
         @input="debouncedFn"
         :class="[
             classes.base,
@@ -17,6 +18,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useDebounceFn } from "@vueuse/core";
+import { generateUuid } from "@utils";
 
 const props = withDefaults(
     defineProps<{
@@ -27,6 +29,7 @@ const props = withDefaults(
         autofocus?: boolean;
         size?: "lg" | "md" | "sm";
         disabled?: boolean;
+        id?: string;
     }>(),
     {
         value: "",
@@ -36,6 +39,7 @@ const props = withDefaults(
         autofocus: false,
         size: "md",
         disabled: false,
+        id: generateUuid("base-input-"),
     }
 );
 
