@@ -9,6 +9,7 @@
             <div>
                 <!-- TODO open modal (button) -->
                 輸入房間號碼
+                <EnterRoomModal />
             </div>
             <div>
                 <!-- TODO open modal (button) -->
@@ -71,7 +72,7 @@ import { RoomListBody, GameResponse } from "@/api/types";
 import BaseDropdown from "@widget/dropdown/BaseDropdown.vue";
 import BaseSearchInput from "@widget/form/searchInput/BaseSearchInput.vue";
 import BasePagination from "@widget/pagination/BasePagination.vue";
-import { CollapsedForm, RoomCards } from "./components";
+import { CollapsedForm, RoomCards, EnterRoomModal } from "./components";
 
 type PublicRoomQuery = Required<RoomListBody>;
 
