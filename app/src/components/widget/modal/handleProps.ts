@@ -15,7 +15,17 @@ export const BaseModalTemplateDefaultProps: BaseModalTemplateProps = {
     onToggle: () => {},
 };
 
-export const availableCloseBtnGapClass = ["m-4", "m-6", "m-8", "m-12", "m-16", "m-20"];
+export const availableCloseBtnGapClass = [
+    "m-0",
+    "m-2",
+    "m-3",
+    "m-4",
+    "m-6",
+    "m-8",
+    "m-12",
+    "m-16",
+    "m-20",
+];
 
 // validators
 export function baseModalTemplatePropValidator(props: BaseModalTemplateProps) {
@@ -29,9 +39,7 @@ export function baseModalTemplatePropValidator(props: BaseModalTemplateProps) {
     }
     // closeBtnGap
     if (props.closeBtnGap) {
-        const closeBtnGapTest = availableCloseBtnGapClass
-            .map(item => item.slice(2))
-            .includes(props.closeBtnGap);
+        const closeBtnGapTest = availableCloseBtnGapClass.includes(props.closeBtnGap);
         if (closeBtnGapTest === false) {
             console.warn("[BaseModalTemplate] prop.closeBtnGap does not pass the validation.");
         }

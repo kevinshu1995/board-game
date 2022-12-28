@@ -114,7 +114,7 @@ const options = {
 
 const closeBtnGapClass = computed(() => {
     return availableCloseBtnGapClass.find(item => {
-        return item.slice(2) === props.closeBtnGap;
+        return item === props.closeBtnGap;
     });
 });
 

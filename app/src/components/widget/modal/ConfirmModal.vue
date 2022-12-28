@@ -4,7 +4,7 @@
             <!-- Modal header -->
             <template v-if="props.isHideHeader === false">
                 <slot name="header">
-                    <div class="flex items-start justify-between p-4">
+                    <div class="p-4">
                         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                             <slot name="headerText" />
                         </h3>
@@ -23,22 +23,21 @@
             <!-- Modal footer -->
             <div
                 v-if="props.isHideFooter === false"
-                class="flex items-center justify-end p-6 space-x-2"
+                class="flex items-center justify-end p-4 space-x-2"
             >
-                <BaseButton
-                    :theme="props.okTheme"
-                    @click="handleClickOk(hide)"
-                    v-if="isHideOk === false"
-                >
-                    <slot name="confirmBtnText"> Ok </slot>
-                </BaseButton>
-
                 <BaseButton
                     :theme="props.cancelTheme"
                     @click="handleClickCancel(hide)"
                     v-if="isHideCancel === false"
                 >
                     <slot name="cancelBtnText"> Cancel </slot>
+                </BaseButton>
+                <BaseButton
+                    :theme="props.okTheme"
+                    @click="handleClickOk(hide)"
+                    v-if="isHideOk === false"
+                >
+                    <slot name="confirmBtnText"> Ok </slot>
                 </BaseButton>
             </div>
         </template>
@@ -60,6 +59,8 @@ interface confirmModalProp extends BaseModalTemplateProps {
     isHideOk?: boolean;
     okTheme?: BaseButtonTheme;
     cancelTheme?: BaseButtonTheme;
+    onClickOk?: () => void;
+    onClickCancel?: () => void;
 }
 
 const props = withDefaults(defineProps<confirmModalProp>(), {
@@ -90,11 +91,18 @@ const props = withDefaults(defineProps<confirmModalProp>(), {
 const emit = defineEmits(["modal", "ok", "cancel"]);
 
 function handleClickOk(hideFn: () => void) {
+    if (props.onClickOk) {
+        props.onClickOk();
+        return;
+    }
     hideFn();
     emit("ok");
 }
 
 function handleClickCancel(hideFn: () => void) {
+    if (props.onClickCancel) {
+        props.onClickCancel();
+    }
     hideFn();
     emit("cancel");
 }
