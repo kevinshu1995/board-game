@@ -47,3 +47,18 @@ export async function getRoomData(room_id: number) {
     }
 }
 
+export async function getRoomAccess(uuid: string) {
+    try {
+        const response = await axiosSupabaseFunction(`/room/access/${uuid}`, {
+            method: "get",
+        });
+
+        return {
+            data: response.data.data,
+            error: null,
+        };
+    } catch (error) {
+        return { data: null, error };
+    }
+}
+
