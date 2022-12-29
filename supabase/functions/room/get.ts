@@ -289,7 +289,16 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
 
     const { data: gameRoomData, error: gameRoomError } = await supabaseClient
         .from("game_rooms")
-        .select()
+        .select(
+            `
+            id,
+            room_name,
+            password,
+            status,
+            uuid,
+            is_full
+            `
+        )
         .eq("uuid", room_uuid);
 
     if (gameRoomError) throw gameRoomError;
@@ -300,9 +309,18 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
 
     const theRoom = gameRoomData[0];
 
+    const basicResponse = {
+        room_id: theRoom.id,
+        room_name: theRoom.room_name,
+        status: theRoom.status,
+        uuid: theRoom.uuid,
+        is_full: theRoom.is_full,
+    };
+
     if (theRoom.password === null) {
         return generateResponse(
             {
+                ...basicResponse,
                 needPassword: false,
             },
             200,
@@ -312,6 +330,7 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
 
     return generateResponse(
         {
+            ...basicResponse,
             needPassword: true,
         },
         200,
