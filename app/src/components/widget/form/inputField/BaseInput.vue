@@ -3,6 +3,7 @@
         type="text"
         :id="props.id"
         @input="debouncedFn"
+        :value="props.value"
         :class="[
             classes.base,
             classes.size[props.size],
