@@ -8,7 +8,7 @@
         <div>
             <div>
                 <!-- TODO open modal (button) -->
-                輸入房間號碼
+
                 <EnterRoomModal />
             </div>
             <div>
