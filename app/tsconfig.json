@@ -3,6 +3,7 @@
         "target": "ESNext",
         "useDefineForClassFields": true,
         "forceConsistentCasingInFileNames": true,
+        "useUnknownInCatchVariables": false,
         "module": "ESNext",
         "moduleResolution": "Node",
         "strict": true,
