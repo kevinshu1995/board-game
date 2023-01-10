@@ -1,5 +1,5 @@
 import { axiosSupabaseFunction } from "../lib/axios";
-import type { RoomListBody } from "../types";
+import type { RoomListBody, RoomAccessResponse } from "../types";
 
 export async function getPublicRooms(body: RoomListBody) {
     try {
@@ -54,7 +54,7 @@ export async function getRoomAccess(uuid: string) {
         });
 
         return {
-            data: response.data.data,
+            data: response.data.data as RoomAccessResponse,
             error: null,
         };
     } catch (error) {

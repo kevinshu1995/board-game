@@ -1,5 +1,6 @@
+import axios from "axios";
 import { axiosSupabaseFunction } from "../lib/axios";
-import type { CreateRoom } from "../types";
+import type { CreateRoom, RegisterNewPlayerParams } from "../types";
 
 export async function setupNewRoom(body: CreateRoom) {
     try {
@@ -17,10 +18,11 @@ export async function setupNewRoom(body: CreateRoom) {
     }
 }
 
-export async function registerNewPlayer(room_id: number) {
+export async function registerNewPlayer(room_id: number, params: RegisterNewPlayerParams) {
     try {
         const response = await axiosSupabaseFunction(`/room/${room_id}/player`, {
             method: "post",
+            params,
         });
 
         return {
