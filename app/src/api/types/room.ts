@@ -49,3 +49,15 @@ export type DeletePlayerBody = {
     player_id: string | null;
 };
 
+export type RoomAccessResponse = {
+    room_id: number;
+    room_name: string;
+    status: RoomStatus;
+    uuid: string;
+    is_full: boolean;
+    needPassword: boolean;
+};
+
+export type RegisterNewPlayerParams = {
+    password: null | string;
+};
