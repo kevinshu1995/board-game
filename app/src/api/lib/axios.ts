@@ -50,18 +50,23 @@ function bindAxios(axiosOptions: AxiosRequestConfig, {}: CustomAxiosOptions): Ax
             return response;
         },
         function (error) {
+            if (import.meta.env.DEV) {
+                // display while developing
+                console.error(error);
+            }
             // Any status codes that falls outside the range of 2xx cause this function to trigger
             // Do something with response error
-            console.error(error);
-            const returnError = error.toJSON();
 
-            // TODO make a error toast
-            console.log({
-                code: returnError.code,
-                status: returnError.response.status,
-                message: returnError.response.data.message,
+            if (error.response && error.response.data) {
+                return Promise.reject(error.response.data);
+            }
+
+            // TODO make a error toast 有奇怪的回應從這邊處理
+            return Promise.reject({
+                code: error.code || "UNEXPECTED_ERROR",
+                message: error.toJSON(),
+                status: 500,
             });
-            return Promise.reject(returnError);
         }
     );
 
