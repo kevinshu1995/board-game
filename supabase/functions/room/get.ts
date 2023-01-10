@@ -1,6 +1,6 @@
 import type { User } from "https://esm.sh/@supabase/supabase-js@2";
 
-import { RoomStatus, RoomListBody } from "./../_share/types.ts";
+import { RoomStatus, RoomListBody, RoomAccessResponse } from "./../_share/types.ts";
 import {
     required,
     isString,
@@ -322,7 +322,7 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
             {
                 ...basicResponse,
                 needPassword: false,
-            },
+            } as RoomAccessResponse,
             200,
             "This room is available"
         );
@@ -332,7 +332,7 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
         {
             ...basicResponse,
             needPassword: true,
-        },
+        } as RoomAccessResponse,
         200,
         "This room need password to access"
     );
