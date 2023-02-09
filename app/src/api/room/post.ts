@@ -22,7 +22,7 @@ export async function registerNewPlayer(room_id: number, params: RegisterNewPlay
     try {
         const response = await axiosSupabaseFunction(`/room/${room_id}/player`, {
             method: "post",
-            params,
+            data: params,
         });
 
         return {
