@@ -314,13 +314,20 @@ export async function getRoomAccess(
 
     const theRoom = gameRoomData[0];
 
+    const user_registered = (() => {
+        if (user === null || theRoom.players === null) {
+            return false;
+        }
+        return theRoom.players.includes(user.id);
+    })();
+
     const basicResponse = {
         room_id: theRoom.id,
         room_name: theRoom.room_name,
         status: theRoom.status,
         uuid: theRoom.uuid,
         is_full: theRoom.is_full,
-        user_registered: user !== null ? theRoom.players.includes(user.id) : false,
+        user_registered,
     };
 
     if (theRoom.password === null) {
