@@ -277,7 +277,11 @@ export async function getRoom(supabaseClient: any, room_id: number) {
     );
 }
 
-export async function getRoomAccess(supabaseClient: any, room_uuid: string | null) {
+export async function getRoomAccess(
+    supabaseClient: any,
+    room_uuid: string | null,
+    user: User | null
+) {
     const { isPass, response } = await validateBody(
         { room_uuid },
         {
@@ -296,7 +300,8 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
             password,
             status,
             uuid,
-            is_full
+            is_full,
+            players
             `
         )
         .eq("uuid", room_uuid);
@@ -315,6 +320,7 @@ export async function getRoomAccess(supabaseClient: any, room_uuid: string | nul
         status: theRoom.status,
         uuid: theRoom.uuid,
         is_full: theRoom.is_full,
+        user_registered: user !== null ? theRoom.players.includes(user.id) : false,
     };
 
     if (theRoom.password === null) {

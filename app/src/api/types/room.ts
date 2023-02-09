@@ -56,8 +56,10 @@ export type RoomAccessResponse = {
     uuid: string;
     is_full: boolean;
     needPassword: boolean;
+    user_registered: boolean;
 };
 
 export type RegisterNewPlayerParams = {
     password: null | string;
 };
+

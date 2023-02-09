@@ -61,7 +61,8 @@ serve(async req => {
                 const testGetRoomAccess = handleUrlPattern(url, "/room/access/:uuid");
                 if (testGetRoomAccess !== null) {
                     const uuid: string | null = testGetRoomAccess?.pathname.groups.uuid || null;
-                    return Get.getRoomAccess(supabaseAdmin, uuid);
+                    const user = await validUser(req);
+                    return Get.getRoomAccess(supabaseAdmin, uuid, user);
                 }
             }
 
