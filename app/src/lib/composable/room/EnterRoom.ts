@@ -36,6 +36,12 @@ type FormSteps = {
     };
 };
 
+enum UserAccessibleOfRoom {
+    HasRegisteredUser = 0,
+    NeedRegisterWithPW = 1,
+    NeedRegisterWithoutPW = 2,
+}
+
 const defaultStatuses: { [k: string]: Status } = {
     uuid: {
         state: null,
@@ -110,12 +116,17 @@ export function useEnterRoom() {
         const isPassedBasicValidation = UuidMethods.uuidBasicCheck();
         if (isPassedBasicValidation) {
             const isAbleToEnterRoom = await UuidMethods.getRoomAccessibleStateWithUuid();
-            if (isAbleToEnterRoom === false) {
+            if (isAbleToEnterRoom === UserAccessibleOfRoom.NeedRegisterWithPW) {
                 // 進入密碼階段
                 stepGoToNext();
                 return false;
             }
-            if (isAbleToEnterRoom === true) {
+            if (isAbleToEnterRoom === UserAccessibleOfRoom.HasRegisteredUser) {
+                // this user has registered
+                routerPushToRoom(form.uuid);
+                return true;
+            }
+            if (isAbleToEnterRoom === UserAccessibleOfRoom.NeedRegisterWithoutPW) {
                 // 進入房間
                 const isSuccess = await tryEnteringRoom({ password: null });
                 if (isSuccess === true) {
@@ -221,21 +232,21 @@ export function useEnterRoom() {
         }
 
         // return boolean, determine the fetched room (roomAccessInfo) is able to access directly or not
-        function isRoomAvailable(): boolean | null {
+        function isRoomAvailable(): UserAccessibleOfRoom | null {
             const data = roomAccessInfo.value;
             if (data === null) {
                 return null;
             }
-
             // 如果這個使用者本來就登記在這個房間的話則直接進入
-            // FIXME registered user and no password room should be different state!
-            if (data.user_registered) return true;
+            if (data.user_registered) return UserAccessibleOfRoom.HasRegisteredUser;
 
-            return data.needPassword === false;
+            return data.needPassword
+                ? UserAccessibleOfRoom.NeedRegisterWithPW
+                : UserAccessibleOfRoom.NeedRegisterWithoutPW;
         }
 
         // null -> 有錯誤，不能進入
-        async function getRoomAccessibleStateWithUuid(): Promise<boolean | null> {
+        async function getRoomAccessibleStateWithUuid(): Promise<UserAccessibleOfRoom | null> {
             // 檢查密碼
             await handleGetRoomAccess(form.uuid);
             return isRoomAvailable();
@@ -307,18 +318,20 @@ export function useEnterRoom() {
         }
 
         const roomUuid = form.uuid;
-
-        resetEveryThing();
-
         // TODO toast
+        routerPushToRoom(roomUuid);
+
+        return true;
+    }
+
+    function routerPushToRoom(roomUuid: string) {
+        resetEveryThing();
         router.push({
             name: "WaitingRoom",
             params: {
                 room_id: roomUuid,
             },
         });
-
-        return true;
     }
 
     function resetEveryThing() {
