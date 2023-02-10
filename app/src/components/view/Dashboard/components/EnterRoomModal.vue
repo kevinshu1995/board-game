@@ -40,7 +40,7 @@ import { onBeforeRouteLeave } from "vue-router";
 
 import ConfirmModal from "@widget/modal/ConfirmModal.vue";
 import { ModalInstance } from "@widget/modal/types";
-import { useEnterRoom } from "@composable/room/EnterRoom";
+import { useEnterRoom } from "@/lib/composable/room/useEnterRoom";
 import { BaseFormGroup, BaseInput } from "@widget/form";
 
 const { currentStep, form, onSubmit, resetEveryThing } = useEnterRoom();
