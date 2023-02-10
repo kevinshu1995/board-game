@@ -1,25 +1,33 @@
 <template>
-    <ConfirmModal @modal="catchModal" size="max-w-lg" @click-ok="submit" close-btn-gap="m-3">
+    <ConfirmModal
+        @modal="catchModal"
+        size="max-w-lg"
+        @click-ok="onClickOk"
+        close-btn-gap="m-3"
+        toggle-btn-text="輸入房間號碼"
+        is-need-toggle-btn
+        @hide="resetEveryThing"
+    >
         <template #headerText>
             <p class="text-center">Enter Room Id</p>
         </template>
         <template #body>
-            <div class="p-5">
+            <div class="p-5 text-center">
                 <BaseFormGroup
-                    :name="formId"
-                    :success-text="status.successText"
-                    :error-text="status.errorText"
-                    :info-text="status.infoText"
-                    :status="status.state"
+                    :name="currentStep.formId"
+                    :success-text="currentStep.status.successText"
+                    :error-text="currentStep.status.errorText"
+                    :normal-text="currentStep.status.infoText"
+                    :status="currentStep.status.state"
                 >
                     <BaseInput
-                        class="text-center"
-                        v-model:value="form.uuid"
-                        :id="formId"
-                        :status="status.state"
-                        placeholder="請填寫房間識別碼"
+                        v-model:value="form[currentStep.name]"
+                        :id="currentStep.formId"
+                        :status="currentStep.status.state"
+                        :placeholder="currentStep.placeholder"
                     />
                 </BaseFormGroup>
+                <!-- 上一步 (only display at password phrase) -->
             </div>
         </template>
     </ConfirmModal>
@@ -28,8 +36,14 @@
 <script lang="ts">
 // types
 enum ErrorCode {
-    empty,
+    uuidEmpty,
     invalidUuid,
+    roomNotFound,
+    serverError,
+    passwordEmpty,
+    passwordWrong,
+    roomIsNotWaiting,
+    roomIsFull,
 }
 
 interface Status extends Record<string, any> {
@@ -39,86 +53,274 @@ interface Status extends Record<string, any> {
     infoText: string;
     errorCode: ErrorCode | null;
 }
+
+type FormStepName = "uuid" | "password";
+type FormSteps = {
+    [key in FormStepName]: {
+        name: FormStepName;
+        formId: string;
+        status: Status;
+        placeholder: string;
+    };
+};
 </script>
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { validate as uuidValidate } from "uuid";
+import { useStepper } from "@vueuse/core";
+
 import ConfirmModal from "@widget/modal/ConfirmModal.vue";
 import { ModalInstance } from "@widget/modal/types";
 import { BaseFormGroup, BaseInput } from "@widget/form";
+import { getRoomAccess, registerNewPlayer } from "@/api";
+import { RoomAccessResponse, RegisterNewPlayerParams } from "@/api/types";
 
 const router = useRouter();
 
-const formId = "room-uuid-input";
-const modal = ref<ModalInstance | null>(null);
-const form = reactive({
-    uuid: "",
-});
-
-const defaultStatus: Status = {
-    state: null,
-    errorCode: null,
-    successText: "",
-    errorText: "",
-    infoText: "",
+const defaultStatuses: { [k: string]: Status } = {
+    uuid: {
+        state: null,
+        errorCode: null,
+        successText: "",
+        errorText: "",
+        infoText: "",
+    },
+    password: {
+        state: null,
+        errorCode: null,
+        successText: "",
+        errorText: "",
+        infoText: "此房間需要密碼才能進入",
+    },
 };
 
-const status: Status = reactive(defaultStatus);
+const formSteps = ref<FormSteps>({
+    uuid: {
+        name: "uuid",
+        formId: "room-uuid-input",
+        status: { ...defaultStatuses.uuid },
+        placeholder: "請填寫房間識別碼",
+    },
+    password: {
+        name: "password",
+        formId: "room-password-input",
+        status: { ...defaultStatuses.password },
+        placeholder: "請填寫房間密碼",
+    },
+});
 
-function submit() {
-    resetStatus();
-    // 檢查格式 (基本檢查)
-    const isPassed = formCheck();
-    if (isPassed) {
-        successFeedback();
+const {
+    current: currentStep,
+    goToNext: stepGoToNext,
+    isCurrent: stepIsCurrent,
+    goBackTo: stepGoBackTo,
+} = useStepper(formSteps);
+
+const modal = ref<ModalInstance | null>(null);
+
+const form = reactive<{
+    uuid: string;
+    password: string;
+}>({
+    uuid: "",
+    password: "",
+});
+const roomAccessInfo = ref<RoomAccessResponse | null>(null);
+
+const UuidMethods = uuidMethods();
+const PwMethods = pwMethods();
+
+function onClickOk() {
+    if (stepIsCurrent("uuid")) {
+        submitUuid();
         return;
+    }
+
+    if (stepIsCurrent("password")) {
+        submitPassword();
+        return;
+    }
+}
+
+async function submitUuid() {
+    resetStatus("uuid");
+    // 檢查格式 (基本檢查)
+    const isPassedBasicValidation = UuidMethods.uuidBasicCheck();
+    if (isPassedBasicValidation) {
+        const isAbleToEnterRoom = await UuidMethods.getRoomAccessibleStateWithUuid();
+        if (isAbleToEnterRoom === false) {
+            // 進入密碼階段
+            stepGoToNext();
+            return;
+        }
+        if (isAbleToEnterRoom === true) {
+            // 進入房間
+            const isSuccess = await tryEnteringRoom({ password: null });
+            if (isSuccess === true) {
+                return;
+            }
+        }
     }
 
     errorFeedback();
 }
 
-function formCheck(): boolean {
-    status.state = null;
-    if (form.uuid === "") {
-        status.errorCode = ErrorCode.empty;
+async function submitPassword() {
+    resetStatus("password");
+    // 檢查格式 (基本檢查)
+    if (PwMethods.pwBasicCheck()) {
+        const isSuccess = await tryEnteringRoom({ password: form.password });
+        if (isSuccess === true) {
+            return;
+        }
+    }
+
+    errorFeedback();
+}
+
+async function handleRegisterPlayer({ password }: RegisterNewPlayerParams): Promise<boolean> {
+    const status = formSteps.value[currentStep.value.name].status; // alias
+    if (roomAccessInfo.value === null) {
+        // display default error
+        stepGoBackTo("uuid");
+        return false;
+    }
+    const { data, error } = await registerNewPlayer(roomAccessInfo.value.room_id, { password });
+
+    if (error) {
+        if (error?.status) {
+            if (error.status === 409) {
+                // 已經註冊過，送進去
+                return true;
+            }
+
+            if (error.status === 403) {
+                status.errorCode = ErrorCode.passwordWrong;
+                return false;
+            }
+
+            if (error.status === 404) {
+                status.errorCode = ErrorCode.roomNotFound;
+            }
+
+            if (error.status === 422) {
+                status.errorCode = ErrorCode.roomIsNotWaiting;
+            }
+
+            if (error.status === 423) {
+                status.errorCode = ErrorCode.roomIsFull;
+            }
+        }
+
+        // display default Error code
+        stepGoBackTo("uuid");
         return false;
     }
 
-    const isPassUuidValidation = uuidValidate(form.uuid);
-    if (isPassUuidValidation === false) {
-        status.errorCode = ErrorCode.invalidUuid;
+    return true;
+}
+
+// uuid
+function uuidMethods() {
+    function uuidBasicCheck(): boolean {
+        const uuidStatus = formSteps.value.uuid.status; // alias
+        if (form.uuid === "") {
+            uuidStatus.errorCode = ErrorCode.uuidEmpty;
+            return false;
+        }
+
+        const isPassUuidValidation = uuidValidate(form.uuid);
+        if (isPassUuidValidation === false) {
+            uuidStatus.errorCode = ErrorCode.invalidUuid;
+        }
+        return isPassUuidValidation;
     }
-    return isPassUuidValidation;
+
+    // fetch the room access info(roomAccessInfo) by passing room uuid
+    async function handleGetRoomAccess(uuid: string): Promise<null | RoomAccessResponse> {
+        const uuidStatus = formSteps.value.uuid.status; // alias
+
+        const { data, error } = await getRoomAccess(uuid);
+
+        if (error) {
+            if (error.status === 404) {
+                uuidStatus.errorCode = ErrorCode.roomNotFound;
+            } else {
+                uuidStatus.errorCode = ErrorCode.serverError;
+            }
+
+            return null;
+        }
+
+        roomAccessInfo.value = data;
+        return data;
+    }
+
+    // return boolean, determine the fetched room (roomAccessInfo) is able to access directly or not
+    function isRoomAvailable(): boolean | null {
+        const data = roomAccessInfo.value;
+        if (data === null) {
+            return null;
+        }
+
+        // 如果這個使用者本來就登記在這個房間的話則直接進入
+        if (data.user_registered) return true;
+
+        return data.needPassword === false;
+    }
+
+    // null -> 有錯誤，不能進入
+    async function getRoomAccessibleStateWithUuid(): Promise<boolean | null> {
+        // 檢查密碼
+        await handleGetRoomAccess(form.uuid);
+        return isRoomAvailable();
+    }
+
+    return { uuidBasicCheck, getRoomAccessibleStateWithUuid };
 }
 
-function resetStatus() {
-    Object.keys(defaultStatus).forEach(
-        key => (status[key as keyof typeof status] = defaultStatus[key])
-    );
-}
+// password
+function pwMethods() {
+    function pwBasicCheck(): boolean {
+        if (form.password.length <= 0) {
+            return false;
+        }
+        return true;
+    }
 
-function successFeedback() {
-    status.state = true;
-    modal.value?.hide();
-    router.push({
-        name: "WaitingRoom",
-        params: {
-            room_id: form.uuid,
-        },
-    });
+    return { pwBasicCheck };
 }
 
 function errorFeedback() {
+    const status = formSteps.value[currentStep.value.name].status; // alias
     status.state = false;
 
     switch (status.errorCode) {
-        case ErrorCode.empty:
+        case ErrorCode.uuidEmpty:
             status.errorText = "房號不可為空";
             break;
+        case ErrorCode.passwordEmpty:
+            status.errorText = "密碼不可為空";
+            break;
+        case ErrorCode.passwordWrong:
+            status.errorText = "密碼錯誤，請確認是否輸入正確密碼";
+            break;
+        case ErrorCode.roomIsNotWaiting:
+            status.errorText = "遊戲已經開始，無法加入成為玩家";
+            break;
+        case ErrorCode.roomIsFull:
+            status.errorText = "房間人數已滿";
+            break;
+        case ErrorCode.roomNotFound:
+            status.errorText = "找不到該房間，請檢查房號是否正確";
+            break;
         case ErrorCode.invalidUuid:
-            status.errorText = "房號格式錯誤，請重新檢查房號是否正確";
+            status.errorText = "房號格式錯誤，請檢查房號是否正確";
+            break;
+        case ErrorCode.serverError:
+            status.errorText = "伺服器發生未知的錯誤，請重新整理或聯絡工程師";
             break;
         default:
             status.errorText = "發生未知的錯誤，請重新整理或聯絡工程師";
@@ -126,9 +328,47 @@ function errorFeedback() {
     }
 }
 
+function resetStatus(targetStep: keyof typeof formSteps.value) {
+    Object.keys(defaultStatuses[targetStep]).forEach(key => {
+        formSteps.value[targetStep].status[key] = defaultStatuses[targetStep][key];
+    });
+}
+
+async function tryEnteringRoom({ password }: RegisterNewPlayerParams) {
+    // register
+    const isRegisterSuccess = await handleRegisterPlayer({ password });
+    if (isRegisterSuccess === false) {
+        // reset password text field
+        form.password = "";
+        return false;
+    }
+
+    const roomUuid = form.uuid;
+
+    modal.value?.hide();
+    resetEveryThing();
+
+    // TODO toast
+    router.push({
+        name: "WaitingRoom",
+        params: {
+            room_id: roomUuid,
+        },
+    });
+
+    return true;
+}
+
+function resetEveryThing() {
+    Object.keys(formSteps.value).forEach(key => {
+        resetStatus(key as FormStepName);
+    });
+    form.uuid = "";
+    form.password = "";
+}
+
 function catchModal(modalInstance: ModalInstance) {
     modal.value = modalInstance;
-    modal.value.show();
 }
 </script>
 
