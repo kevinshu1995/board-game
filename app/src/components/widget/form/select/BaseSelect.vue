@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { generateUuid } from "@utils";
 
 const id = ref(generateUuid("select-"));

@@ -13,7 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { feedbackText as feedbackTextClasses, label as labelClasses } from "./../statusClasses";
 
 const props = withDefaults(

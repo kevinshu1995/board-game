@@ -35,9 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { onBeforeRouteLeave } from "vue-router";
-
 import ConfirmModal from "@widget/modal/ConfirmModal.vue";
 import { ModalInstance } from "@widget/modal/types";
 import { useEnterRoom } from "@/lib/composable/room/useEnterRoom";

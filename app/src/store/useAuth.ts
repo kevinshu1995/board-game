@@ -1,6 +1,3 @@
-import { defineStore } from "pinia";
-import { ref, computed, onMounted } from "vue";
-
 import type { Session } from "@supabase/supabase-js";
 import {
     signInWithProvider as handleSignInWithProvider,

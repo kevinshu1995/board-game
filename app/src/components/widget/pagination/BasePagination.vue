@@ -71,7 +71,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { useOffsetPagination } from "@vueuse/core";
 
 const props = defineProps<{

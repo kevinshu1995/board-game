@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import svgLoader from "vite-svg-loader";
 import "dotenv/config";
 import VueMacros from "unplugin-vue-macros/vite";
+import AutoImport from "unplugin-auto-import/vite";
 
 // https://vitejs.dev/config/
 export default ({}) => {
@@ -32,6 +33,18 @@ export default ({}) => {
             },
         },
         plugins: [
+            AutoImport({
+                include: [
+                    /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+                    /\.vue$/,
+                    /\.vue\?vue/, // .vue
+                ],
+                imports: ["vue", "vue-router", "pinia", "vitest"],
+                dts: true,
+                eslintrc: {
+                    enabled: false,
+                },
+            }),
             VueMacros({
                 plugins: {
                     vue: vue(),

@@ -1,4 +1,3 @@
-import { defineStore } from "pinia";
 import { useDark as vueUseDark, useToggle } from "@vueuse/core";
 
 export const useDark = defineStore("useDark", () => {

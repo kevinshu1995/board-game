@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from "vue";
 const props = defineProps<{
     name: string;
 }>();

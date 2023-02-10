@@ -61,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
 import Flowbite from "@flowbite";
 import BaseButton from "@widget/button/BaseButton.vue";
 import type { BaseModalTemplateProps, ModalInstance } from "./types";

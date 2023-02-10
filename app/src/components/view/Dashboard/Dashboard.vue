@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, toRaw } from "vue";
 import type { Ref } from "vue";
 import { watchThrottled } from "@vueuse/core";
 

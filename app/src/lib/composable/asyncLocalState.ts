@@ -1,6 +1,5 @@
 import { useStorage, useAsyncState, UseAsyncStateReturn } from "@vueuse/core";
 import type { Ref } from "vue";
-import { watch } from "vue";
 
 type useAsyncLocalStateOptions<Data> = {
     storageKey: string;

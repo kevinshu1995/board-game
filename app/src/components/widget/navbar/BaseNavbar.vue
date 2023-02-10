@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
-import { useLink } from "vue-router";
 import FlowBite from "@flowbite";
 import { onClickOutside } from "@vueuse/core";
 import { CollapseMethods, CollapseOptions } from "./types";

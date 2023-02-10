@@ -17,7 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { generateUuid } from "@utils";
 

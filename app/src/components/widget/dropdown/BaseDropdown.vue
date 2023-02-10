@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
 import { themeTypes, getTheme } from "@utils";
 import Flowbite from "@flowbite";
 
