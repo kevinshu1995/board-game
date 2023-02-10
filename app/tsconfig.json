@@ -14,7 +14,7 @@
         "lib": ["ESNext", "DOM"],
         "skipLibCheck": true,
         "noEmit": true,
-        "types": ["unplugin-vue-macros/macros-global"],
+        "types": ["unplugin-vue-macros/macros-global", "vitest/globals"],
         "paths": {
             "@/*": ["./src/*"],
             "@view/*": ["./src/components/view/*"],
