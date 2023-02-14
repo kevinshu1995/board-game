@@ -5,6 +5,13 @@ import "dotenv/config";
 import VueMacros from "unplugin-vue-macros/vite";
 import AutoImport from "unplugin-auto-import/vite";
 
+import type { InlineConfig } from "vitest";
+import type { UserConfig } from "vite";
+
+interface VitestConfigExport extends UserConfig {
+    test: InlineConfig;
+}
+
 // https://vitejs.dev/config/
 export default ({}) => {
     return defineConfig({
@@ -32,6 +39,11 @@ export default ({}) => {
                 },
             },
         },
+        test: {
+            globals: true,
+            environment: "happy-dom",
+            setupFiles: ["./mock/server.ts"],
+        },
         plugins: [
             AutoImport({
                 include: [
@@ -53,6 +65,6 @@ export default ({}) => {
             // vue(),
             svgLoader(),
         ],
-    });
+    } as VitestConfigExport);
 };
 
