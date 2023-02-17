@@ -261,6 +261,7 @@ export default [
 
     // getRoomAccess
     rest.get(`${baseUrl}/room/access/:room_uuid`, (req, res, ctx) => {
+        console.log("access!");
         const { room_uuid } = req.params;
         if (room_uuid === roomAccesses.noPasswordRegistered.uuid) {
             return res(ctx.status(200), ctx.json(roomAccess["200"].noPasswordRegistered));
