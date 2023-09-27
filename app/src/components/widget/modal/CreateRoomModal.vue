@@ -1,20 +1,19 @@
 <template>
-    <!-- TODO form submit (press Enter to submit) -->
     <ConfirmModal
         @modal="catchModal"
         size="max-w-lg"
-        @click-ok="onSubmit"
+        @click-ok="onModalClickOk"
         close-btn-gap="m-3"
-        toggle-btn-text="加入房間"
+        toggle-btn-text="建立房間"
         is-need-toggle-btn
-        @hide="resetEveryThing"
+        @hide="onModalHide"
     >
         <template #headerText>
-            <p class="text-center">Enter Room Id</p>
+            <p class="text-center">Create A New Room</p>
         </template>
         <template #body>
             <div class="p-5 text-center">
-                <BaseFormGroup
+                <!-- <BaseFormGroup
                     :name="currentStep.formId"
                     :success-text="currentStep.status.successText"
                     :error-text="currentStep.status.errorText"
@@ -27,8 +26,7 @@
                         :status="currentStep.status.state"
                         :placeholder="currentStep.placeholder"
                     />
-                </BaseFormGroup>
-                <!-- TODO 上一步 btn (only display at password phrase) -->
+                </BaseFormGroup> -->
             </div>
         </template>
     </ConfirmModal>
@@ -37,12 +35,19 @@
 <script setup lang="ts">
 import ConfirmModal from "@core/modal/ConfirmModal.vue";
 import { ModalInstance } from "@core/modal/types";
-import { useStepsEnterRoom } from "@/lib/composable/room/useEnterRoom";
+import { useStepsCreateRoom } from "@/lib/composable/room/useCreateRoom";
 import { BaseFormGroup, BaseInput } from "@core/form";
 
-const { currentStep, form, onSubmit, resetEveryThing } = useStepsEnterRoom();
-
 const modal = ref<ModalInstance | null>(null);
+const {} = useStepsCreateRoom();
+
+function onModalHide() {
+    console.log("hide");
+}
+
+function onModalClickOk() {
+    console.log("hide");
+}
 
 onBeforeRouteLeave(() => {
     modal.value?.hide();

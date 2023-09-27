@@ -57,7 +57,7 @@ const defaultStatuses: { [k: string]: Status } = {
     },
 };
 
-export function useEnterRoom() {
+export function useStepsEnterRoom() {
     const router = useRouter();
 
     const UuidMethods = uuidMethods();
@@ -87,12 +87,7 @@ export function useEnterRoom() {
         },
     });
 
-    const {
-        current: currentStep,
-        goToNext: stepGoToNext,
-        isCurrent: stepIsCurrent,
-        goBackTo: stepGoBackTo,
-    } = useStepper(formSteps);
+    const { current: currentStep, goToNext: stepGoToNext, isCurrent: stepIsCurrent, goBackTo: stepGoBackTo } = useStepper(formSteps);
 
     async function onSubmit() {
         if (stepIsCurrent("uuid")) {
@@ -238,9 +233,7 @@ export function useEnterRoom() {
             // 如果這個使用者本來就登記在這個房間的話則直接進入
             if (data.user_registered) return UserAccessibleOfRoom.HasRegisteredUser;
 
-            return data.needPassword
-                ? UserAccessibleOfRoom.NeedRegisterWithPW
-                : UserAccessibleOfRoom.NeedRegisterWithoutPW;
+            return data.needPassword ? UserAccessibleOfRoom.NeedRegisterWithPW : UserAccessibleOfRoom.NeedRegisterWithoutPW;
         }
 
         // null -> 有錯誤，不能進入
