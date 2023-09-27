@@ -1,14 +1,6 @@
-import type { BaseButtonTheme, BaseButtonShape } from "@widget/button/types";
+import type { BaseButtonTheme, BaseButtonShape } from "@core/button/types";
 
-export type Size =
-    | "max-w-xs"
-    | "max-w-sm"
-    | "max-w-md"
-    | "max-w-lg"
-    | "max-w-xl"
-    | "max-w-2xl"
-    | "max-w-3xl"
-    | "max-w-4xl";
+export type Size = "max-w-xs" | "max-w-sm" | "max-w-md" | "max-w-lg" | "max-w-xl" | "max-w-2xl" | "max-w-3xl" | "max-w-4xl";
 
 export type IsClickBackdropClose = boolean;
 export type IsShowCloseBtn = boolean;

@@ -22,19 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { BaseButton } from "@widget/button";
+import { BaseButton } from "@core/button";
 
 import { useAuth } from "@/store";
-import {
-    getGames,
-    getGame,
-    setupNewRoom,
-    registerNewPlayer,
-    getPublicRooms,
-    getRoomPlayers,
-    getRoomData,
-    deletePlayerInRoom,
-} from "@/api";
+import { getGames, getGame, setupNewRoom, registerNewPlayer, getPublicRooms, getRoomPlayers, getRoomData, deletePlayerInRoom } from "@/api";
 
 const auth = useAuth();
 

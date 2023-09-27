@@ -21,12 +21,7 @@
             <!-- Query form -->
             <div class="space-y-2">
                 <div class="flex gap-4 flex-wrap">
-                    <BaseSearchInput
-                        placeholder="Search room title"
-                        class="grow"
-                        :debounce="1000"
-                        v-model:value-model="publicRoomQuery.keyword"
-                    />
+                    <BaseSearchInput placeholder="Search room title" class="grow" :debounce="1000" v-model:value-model="publicRoomQuery.keyword" />
 
                     <BaseDropdown custom-style="round" theme="light-n-border">
                         <template #trigger>
@@ -36,7 +31,7 @@
                         </template>
                         <template #dropdown>
                             <div class="flex flex-col p-4 gap-4 w-60">
-                                <CollapsedForm :games="games" v-model:form="publicRoomQuery" />
+                                <FilterRoomForm :games="games" v-model:form="publicRoomQuery" />
                             </div>
                         </template>
                     </BaseDropdown>
@@ -68,10 +63,11 @@ import { watchThrottled } from "@vueuse/core";
 import { getGames, getPublicRooms } from "@/api";
 import { useAsyncLocalState } from "@composable";
 import { RoomListBody, GameResponse } from "@/api/types";
-import BaseDropdown from "@widget/dropdown/BaseDropdown.vue";
-import BaseSearchInput from "@widget/form/searchInput/BaseSearchInput.vue";
-import BasePagination from "@widget/pagination/BasePagination.vue";
-import { CollapsedForm, RoomCards, EnterRoomModal } from "./components";
+import BaseDropdown from "@core/dropdown/BaseDropdown.vue";
+import BaseSearchInput from "@core/form/searchInput/BaseSearchInput.vue";
+import BasePagination from "@core/pagination/BasePagination.vue";
+import { FilterRoomForm, RoomCards } from "./components";
+import { EnterRoomModal } from "@widget/modal";
 
 type PublicRoomQuery = Required<RoomListBody>;
 

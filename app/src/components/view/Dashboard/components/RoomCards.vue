@@ -2,11 +2,7 @@
     <ul :class="[props.rooms.length > 0 && 'grid grid-cols-2 gap-4']">
         <template v-if="props.rooms.length > 0">
             <li v-for="room in props.rooms" :key="room.id">
-                <BaseCard
-                    tag="routerLink"
-                    padding="p-2"
-                    :to="{ name: 'WaitingRoom', params: { room_id: room.uuid } }"
-                >
+                <BaseCard tag="routerLink" padding="p-2" :to="{ name: 'WaitingRoom', params: { room_id: room.uuid } }">
                     <div>
                         <p>Game Name: {{ getGameDetail(room.game_id)?.name_zh_tw }}</p>
                         <p>Room Full: {{ room.is_full }}</p>
@@ -28,7 +24,7 @@
 
 <script setup lang="ts">
 import { GameResponse } from "@/api/types";
-import BaseCard from "@widget/card/BaseCard.vue";
+import BaseCard from "@core/card/BaseCard.vue";
 
 const props = defineProps<{
     // TODO room type

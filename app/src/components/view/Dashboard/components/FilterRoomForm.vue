@@ -9,7 +9,7 @@
 import { RoomListBody, RoomStatus, RoomStatusZhTw } from "@/api/types";
 import { convertEnum } from "@utils";
 
-import BaseSelect from "@widget/form/select/BaseSelect.vue";
+import BaseSelect from "@core/form/select/BaseSelect.vue";
 
 const props = defineProps<{
     form: Pick<RoomListBody, "game_id" | "status" | "has_password" | "is_full">;
@@ -28,8 +28,7 @@ const formObj = computed({
 });
 
 // room status
-const formatRoomStatus = (obj: { key: string; value: any }[]) =>
-    obj.filter(({ key }) => key !== "None");
+const formatRoomStatus = (obj: { key: string; value: any }[]) => obj.filter(({ key }) => key !== "None");
 const roomStatusZhTw = formatRoomStatus(convertEnum(RoomStatusZhTw));
 const roomStatusOptions = formatRoomStatus(convertEnum(RoomStatus))
     .map(item => {

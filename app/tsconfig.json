@@ -18,6 +18,7 @@
         "paths": {
             "@/*": ["./src/*"],
             "@view/*": ["./src/components/view/*"],
+            "@core/*": ["./src/components/core/*"],
             "@widget/*": ["./src/components/widget/*"],
             "@composable/*": ["./src/lib/composable/*"],
             "@composable": ["./src/lib/composable"],
@@ -25,14 +26,7 @@
             "@utils": ["./src/lib/utils"]
         }
     },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.d.ts",
-        "src/**/*.tsx",
-        "src/**/*.vue",
-        "__tests__/**/*.ts",
-        "./auto-imports.d.ts"
-    ],
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "__tests__/**/*.ts", "./auto-imports.d.ts"],
     "references": [{ "path": "./tsconfig.node.json" }]
 }
 

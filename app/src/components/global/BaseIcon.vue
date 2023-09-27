@@ -8,6 +8,6 @@ const props = defineProps<{
 }>();
 
 // https://heroicons.dev/
-const iconComponent = defineAsyncComponent(() => import(`../../../assets/icon/${props.name}.svg`));
+const iconComponent = defineAsyncComponent(() => import(`../../assets/icon/${props.name}.svg`));
 </script>
 

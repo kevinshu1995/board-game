@@ -19,6 +19,7 @@ export default ({}) => {
             alias: [
                 { find: "@", replacement: "/src" },
                 { find: "@view", replacement: "/src/components/view" },
+                { find: "@core", replacement: "/src/components/core" },
                 { find: "@widget", replacement: "/src/components/widget" },
                 { find: "@composable", replacement: "/src/lib/composable" },
                 { find: "@utils", replacement: "/src/lib/utils" },

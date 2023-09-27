@@ -1,6 +1,5 @@
-import CollapsedForm from "./CollapsedForm.vue";
+import FilterRoomForm from "./FilterRoomForm.vue";
 import RoomCards from "./RoomCards.vue";
-import EnterRoomModal from "./EnterRoomModal.vue";
 
-export { CollapsedForm, RoomCards, EnterRoomModal };
+export { FilterRoomForm, RoomCards };
 

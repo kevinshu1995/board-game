@@ -35,10 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import ConfirmModal from "@widget/modal/ConfirmModal.vue";
-import { ModalInstance } from "@widget/modal/types";
+import ConfirmModal from "@core/modal/ConfirmModal.vue";
+import { ModalInstance } from "@core/modal/types";
 import { useEnterRoom } from "@/lib/composable/room/useEnterRoom";
-import { BaseFormGroup, BaseInput } from "@widget/form";
+import { BaseFormGroup, BaseInput } from "@core/form";
 
 const { currentStep, form, onSubmit, resetEveryThing } = useEnterRoom();
 

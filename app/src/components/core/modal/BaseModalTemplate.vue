@@ -27,10 +27,7 @@
             >
                 <div :class="[props.size, 'relative w-full']">
                     <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <slot
-                            name="closeBtn"
-                            :hide="() => modalInstance?.hide && modalInstance.hide()"
-                        >
+                        <slot name="closeBtn" :hide="() => modalInstance?.hide && modalInstance.hide()">
                             <button
                                 v-if="props.isShowCloseBtn"
                                 type="button"
@@ -62,13 +59,9 @@
 
 <script setup lang="ts">
 import Flowbite from "@flowbite";
-import BaseButton from "@widget/button/BaseButton.vue";
+import BaseButton from "@core/button/BaseButton.vue";
 import type { BaseModalTemplateProps, ModalInstance } from "./types";
-import {
-    BaseModalTemplateDefaultProps as pd,
-    baseModalTemplatePropValidator,
-    availableCloseBtnGapClass,
-} from "./handleProps";
+import { BaseModalTemplateDefaultProps as pd, baseModalTemplatePropValidator, availableCloseBtnGapClass } from "./handleProps";
 
 const props = withDefaults(defineProps<BaseModalTemplateProps>(), {
     // this is the only way for now

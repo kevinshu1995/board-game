@@ -12,31 +12,15 @@
                 </slot>
             </template>
             <!-- Modal body -->
-            <div
-                :class="[
-                    props.isUsingBodyClass &&
-                        'text-base leading-relaxed text-gray-500 dark:text-gray-400',
-                ]"
-            >
+            <div :class="[props.isUsingBodyClass && 'text-base leading-relaxed text-gray-500 dark:text-gray-400']">
                 <slot name="body" :hide="hide" />
             </div>
             <!-- Modal footer -->
-            <div
-                v-if="props.isHideFooter === false"
-                class="flex items-center justify-end p-4 space-x-2"
-            >
-                <BaseButton
-                    :theme="props.cancelTheme"
-                    @click="handleClickCancel(hide)"
-                    v-if="isHideCancel === false"
-                >
+            <div v-if="props.isHideFooter === false" class="flex items-center justify-end p-4 space-x-2">
+                <BaseButton :theme="props.cancelTheme" @click="handleClickCancel(hide)" v-if="isHideCancel === false">
                     <slot name="cancelBtnText"> Cancel </slot>
                 </BaseButton>
-                <BaseButton
-                    :theme="props.okTheme"
-                    @click="handleClickOk(hide)"
-                    v-if="isHideOk === false"
-                >
+                <BaseButton :theme="props.okTheme" @click="handleClickOk(hide)" v-if="isHideOk === false">
                     <slot name="confirmBtnText"> Ok </slot>
                 </BaseButton>
             </div>
@@ -45,10 +29,10 @@
 </template>
 
 <script setup lang="ts">
-import BaseButton from "@widget/button/BaseButton.vue";
+import BaseButton from "@core/button/BaseButton.vue";
 import BaseModalTemplate from "./BaseModalTemplate.vue";
 import type { BaseModalTemplateProps } from "./types";
-import type { BaseButtonTheme } from "@widget/button/types";
+import type { BaseButtonTheme } from "@core/button/types";
 import { BaseModalTemplateDefaultProps as pd, baseModalTemplatePropValidator } from "./handleProps";
 
 interface confirmModalProp extends BaseModalTemplateProps {

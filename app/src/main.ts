@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
 import Router from "./route";
-import GlobalComponents from "./components/widget/globalComponent";
+import GlobalComponents from "./components/global";
 
 import { createPinia } from "pinia";
 
